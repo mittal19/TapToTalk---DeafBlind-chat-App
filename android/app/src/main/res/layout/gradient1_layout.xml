@@ -6,8 +6,9 @@
         android:startColor = "#00d4ff"
         android:centerColor = "#020228"
         android:endColor = "#020228"
-        android:centerX="0.3"
-        android:centerY="0.2"
-        android:angle = "45"
-        android:type = "linear" />
+        android:centerX="0.5"
+        android:centerY="0.25"
+        android:type = "radial" 
+        android:gradientRadius = "200%"
+        />     
 </shape>
