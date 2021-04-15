@@ -103,7 +103,7 @@ function App()
         setTimeout(()=>
         {
           SplashScreen.hide();
-        },1000);
+        },10000);
         
     },[]);
 

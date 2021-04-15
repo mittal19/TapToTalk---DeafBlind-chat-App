@@ -65,13 +65,14 @@ export function component_userNumber({navigation})
       <TextInput
         style={styles.phonenumber}
         placeholder="Enter 10 digit Phone number"
+        placeholderTextColor="white"
         keyboardType='phone-pad'
         value={userNumber}
         onChangeText={set_userNumber}
         maxLength={10}
       />
       <TouchableOpacity style={styles.button} onPress={function_sendOtp}>
-        <Text>Send OTP</Text>
+        <Text style={styles.buttontext} >Send OTP</Text>
       </TouchableOpacity>
     </View>
   );
