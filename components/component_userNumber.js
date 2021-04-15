@@ -3,12 +3,17 @@
 //if otp is sent then navigate to otp screen
 
 import React from 'react';
-import {View,Text,TextInput,TouchableOpacity,ToastAndroid,ActivityIndicator} from 'react-native';
+import {View,Text,TextInput,TouchableOpacity,ToastAndroid,ActivityIndicator,Image,Dimensions} from 'react-native';
 import {styles} from './styling/style_userNumber';
+import LinearGradient from 'react-native-linear-gradient';
+
+const {width, height} = Dimensions.get('window');
 
 export function component_userNumber({navigation})
 {
   
+  console.log(width+" "+height);
+
   const [userNumber,set_userNumber] = React.useState('');    // state for holding phone number
   const [sendingOtp,set_sendingOtp] = React.useState(false);    // state for showing activity indicator
 
@@ -59,10 +64,94 @@ export function component_userNumber({navigation})
       </View>
     );
   }
-
+//in image 376 and 275 is width and height of logo
   return(
-    <View style={styles.container}>
-      <TextInput
+    <View style={{flex:1}}>
+        
+        <View style={{}}>
+          <LinearGradient colors={['#5264F9', '#5264df', '#C72FF899']} style={{height:height/2,width:width/1.1,left:-width/32,top:-height/8,position:'absolute',borderRadius:175}} />
+          <View style={{height:height/2,width:width/1.1,left:-width/32,top:-height/8,borderRadius:175}}></View>
+          <LinearGradient colors={['#5264F9', '#5264e0', '#d33af9a9']} style={{height:height/2,width:width/1.1,left:-width/8,top:-height/12,position:'absolute',borderRadius:175}} />
+          <View style={{height:height/2,width:width/1.1,left:-width/8,top:-height/12,borderRadius:175,position:'absolute'}}></View>
+          <LinearGradient colors={['#5264F9', '#5264ff', '#3af9ef99']} style={{height:height/2,width:width/1.1,left:-width/4,top:-height/8,position:'absolute',borderRadius:175}} />
+          <View style={{height:height/2,width:width/1.1,left:-width/4,top:-height/8,borderRadius:175,position:"absolute"}}></View>  
+          
+          <Image style={{height:0.25*275*width/376,width:0.25*width,left:width/8,top:height/16,position:'absolute'}} source={require('./res/TapToTalk_5.png')}/>    
+          <Text style={{left:width/8,top:height/16+0.25*275*width/376+height/20,position:'absolute',color:"#ffffff",fontSize:0.07*width,fontWeight:"bold"}}>Welcome</Text>      
+        </View>
+        
+
+        <View style={{}}>
+          <Text style={{width:101,height:34,fontSize:28,color:"#3a3a3a",lineHeight:34,fontWeight:"700"}}>Sign in</Text>
+          
+          <View style={{width:314,height:58}}>
+            <Text style={{width:101,height:17,fontStyle:'normal',fontWeight:"normal",fontSize:14,lineHeight:17,color:"#b9b9b9"}}>Phone Number</Text>
+            <TextInput
+              style={{fontWeight:"900",color:"#000000",borderBottomWidth:1,borderColor:"#2743fd"}}
+              placeholderTextColor="white"
+              keyboardType='phone-pad'
+              value={userNumber}
+              onChangeText={set_userNumber}
+              maxLength={10}
+            />
+          </View>
+          
+          <View>
+            <TouchableOpacity onPress={function_sendOtp}>
+              <Text>Send OTP</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      
+
+    </View>
+  );
+
+}
+
+/*
+
+<View style={{}}>
+          <Text style={{width:101,height:34,fontSize:28,color:"#3a3a3a",lineHeight:34,fontWeight:"700"}}>Sign in</Text>
+          
+          <View style={{width:314,height:58}}>
+            <Text style={{width:101,height:17,fontStyle:'normal',fontWeight:"normal",fontSize:14,lineHeight:17,color:"#b9b9b9"}}>Phone Number</Text>
+            <TextInput
+              style={{fontWeight:"900",color:"#000000",borderBottomWidth:1,borderColor:"#2743fd"}}
+              placeholderTextColor="white"
+              keyboardType='phone-pad'
+              value={userNumber}
+              onChangeText={set_userNumber}
+              maxLength={10}
+            />
+          </View>
+          
+          <View>
+            <TouchableOpacity onPress={function_sendOtp}>
+              <Text>Send OTP</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+
+
+
+<View>
+        <View style={{height:352,width:352,left:-12,top:-106,borderRadius:500,backgroundColor:"#5263f9",position:"absolute"}}>
+        </View>
+        <View style={{height:352,width:352,left:-43,top:-56,borderRadius:500,backgroundColor:"#5264f9",position:"absolute"}}>
+        </View>
+        <View style={{height:352,width:352,left:-74,top:-84,borderRadius:500,backgroundColor:"#3af9ef",position:"absolute"}}>
+        </View>
+      </View>
+      <View style={{}}>
+        <Text>fad</Text>
+      </View>
+
+<Image style={{height:59,width:60,top:64,left:52}} source={require('./res/logo.png')} />
+        <Text  style={{height:61,width:136,top:100,left:52,fontSize:30,color:"#ffffff",fontStyle:"normal"}}>Welcome</Text>
+
+<TextInput
         style={styles.phonenumber}
         placeholder="Enter 10 digit Phone number"
         placeholderTextColor="white"
@@ -74,7 +163,4 @@ export function component_userNumber({navigation})
       <TouchableOpacity style={styles.button} onPress={function_sendOtp}>
         <Text style={styles.buttontext} >Send OTP</Text>
       </TouchableOpacity>
-    </View>
-  );
-
-}
+      */
