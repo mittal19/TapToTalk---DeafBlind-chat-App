@@ -2,16 +2,18 @@
 //then sending otp using fetch .. api is created...see expressbackend for api details.
 //if otp is sent then navigate to otp screen
 
-import React, { useState, useEffect } from 'react';
-import {View,Text,Dimensions,TextInput,TouchableOpacity,ToastAndroid,ActivityIndicator,Image,Keyboard} from 'react-native';
-import {styles} from './styling/style_userNumber';
+import React, { useState, useEffect, useRef } from 'react';
+import {View,Text,TextInput,TouchableOpacity,ToastAndroid,ActivityIndicator,Image,Keyboard,Animated} from 'react-native';
+import styles,{width,height} from './styling/style_userNumber';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/AntDesign';
 
-const {width, height} = Dimensions.get('window');
+
 
 export function component_userNumber({navigation})
 {
+  const fadeAnim = useRef(new Animated.Value(height/2)).current;
+
   useEffect(() => 
   {
     Keyboard.addListener("keyboardDidShow", _keyboardDidShow);
@@ -26,9 +28,25 @@ export function component_userNumber({navigation})
   }, []);
 
   const [keyboardStatus, setKeyboardStatus] = useState(false);
-  const _keyboardDidShow = () => setKeyboardStatus(true);
-  const _keyboardDidHide = () => setKeyboardStatus(false);
-  
+
+  const _keyboardDidShow = () => 
+  {
+    setKeyboardStatus(true);
+    Animated.timing(fadeAnim,{
+      toValue:0,
+      duration:300,
+      useNativeDriver:false
+    }).start();
+  }
+  const _keyboardDidHide = () => 
+  {
+    setKeyboardStatus(false);
+    Animated.timing(fadeAnim,{
+      toValue:height/2,
+      duration:0,
+      useNativeDriver:false
+    }).start();
+  }
 
   const [userNumber,set_userNumber] = React.useState('');    // state for holding phone number
   const [sendingOtp,set_sendingOtp] = React.useState(false);    // state for showing activity indicator
@@ -85,30 +103,51 @@ export function component_userNumber({navigation})
 //in image 376 and 275 is width and height of logo   
   return(
     <View style={styles.container}>
-       {
-          keyboardStatus==false?
-            <View style={styles.upperView}>
-              <View style={styles.upperCircle}>
-                <LinearGradient colors={["#C72FF8FF","#5264F9FF"]} style={styles.upperCircleGradient} />
-              </View>
+        <View style={{}}>
+          <Animated.View style={[styles.upperCircle,{height:fadeAnim}]}>
+            {
+              keyboardStatus?
+              <View></View>  
+              :
+              <LinearGradient colors={["#C72FF8FF","#5264F9FF"]} style={styles.upperCircleGradient} />  
+            }
+          </Animated.View>
 
-              <View style={styles.midCircle}>
-                <LinearGradient colors={["#5264F9BF","#3E4DC8E6"]} style={styles.midCircleGradient} />
-              </View>
+          <Animated.View style={[styles.midCircle,{height:fadeAnim}]}>
+            {
+              keyboardStatus?
+              <View></View>  
+              :
+              <LinearGradient colors={["#5264F9BF","#3E4DC8E6"]} style={styles.midCircleGradient} />  
+            }
+          </Animated.View>
 
-              <View style={styles.lowerCircle}>
-                <LinearGradient colors={["#5264F9FF","#3AF9EFFF"]} style={styles.lowerCircleGradient} />
-              </View>
-              
-              <View style={styles.midView}>
-                <Image style={styles.logo} source={require('./res/TapToTalk_5.png')}/>    
-                <Text style={styles.welcome}>Welcome</Text>
-              </View>
+          <Animated.View style={[styles.lowerCircle,{height:fadeAnim}]}>
+            {
+              keyboardStatus?
+              <View></View>  
+              :
+              <LinearGradient colors={["#5264F9FF","#3AF9EFFF"]} style={styles.lowerCircleGradient} />  
+            }
+          </Animated.View>
+          
+          {
+            keyboardStatus?
+            <View></View>
+            :
+            <View style={styles.midView}>
+              <Image style={styles.logo} source={require('./res/TapToTalk_5.png')}/>    
+              <Text style={styles.welcome}>Welcome</Text>
             </View>
+          }
+        </View>
+    
+        {
+          keyboardStatus?
+          <View style={styles.keyboardView}></View>
           :
-          <View style={styles.keyboardView} />
-       }
-
+          <View></View>
+        }
         <View style={styles.signInView}>
 
           <Text style={styles.signIntext}>Sign up</Text>
@@ -139,7 +178,7 @@ export function component_userNumber({navigation})
 
           <View style={{}}>
             
-            <LinearGradient colors={["#3E4DC880", "#3E4DC8FF", "#3E4DC8FF", "#3E4DC8FF"]} start={{x: 0, y: 0}} end={{x: 1, y: 1}} style={{borderRadius:28}} >
+            <LinearGradient colors={["#3E4DC880", "#3E4DC8FF", "#3E4DC8FF", "#3E4DC8FF"]} start={{x: 0, y: 0}} end={{x: 1, y: 1}} style={styles.getotpGradient} >
               <TouchableOpacity style={styles.touchableopacity} onPress={function_sendOtp} >
                 <View style={styles.touchableopacityView}>
                   <Text style={styles.getotp}>Get OTP</Text>

@@ -1,8 +1,8 @@
 import {StyleSheet, Dimensions} from 'react-native';
 
-const {width, height} = Dimensions.get('window');
+export const {width, height} = Dimensions.get('window');
 
-const styles = StyleSheet.create({
+export default StyleSheet.create({
    container:{
        flex:1,
        backgroundColor:"#ffffff"
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
         fontSize:width/24,
         color:"#b9b9b9"
     },
-    phonenumberhorizaontalView:{
+    phonenumberhorizontalView:{
         flexDirection:'row',
         justifyContent:"space-between"
     },
@@ -100,6 +100,9 @@ const styles = StyleSheet.create({
         justifyContent:'center',
         alignItems:"center",
         marginRight:width/32
+    },
+    getotpGradient:{
+        borderRadius:28
     },
     touchableopacity:{
         height:height/10,
@@ -128,5 +131,3 @@ const styles = StyleSheet.create({
         borderRadius:100
     }
 });
-
-exports.styles = styles;
