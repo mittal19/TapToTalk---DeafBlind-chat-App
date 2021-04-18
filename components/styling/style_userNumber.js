@@ -1,27 +1,131 @@
-import {StyleSheet} from 'react-native';
+import {StyleSheet, Dimensions} from 'react-native';
+
+const {width, height} = Dimensions.get('window');
 
 const styles = StyleSheet.create({
-    container:{
-        backgroundColor:"#020228",
-        flex:1,
+   container:{
+       flex:1,
+       backgroundColor:"#ffffff"
+   },
+   upperView:{
+       height:height/2
+   },
+   upperCircle:{
+       height:height/2,
+       width:height/2
+   },
+   upperCircleGradient:{
+       height:height/2,
+       width:height/2,
+       left:-width/40,
+       top:-height/6,
+       position:'absolute',
+       borderRadius:500
+   },
+   midCircle:{
+       height:height/2,
+       width:height/2,
+       position:'absolute'
+    },
+   midCircleGradient:{
+       height:height/2,
+       width:height/2,
+       left:-width/10,
+       top:-height/14,
+       position:'absolute',
+       borderRadius:500
+    },
+    lowerCircle:{
+        height:height/2,
+        width:height/2,
+        position:"absolute"
+    },
+    lowerCircleGradient:{
+        height:height/2,
+        width:height/2,
+        left:-width/6,
+        top:-height/8,
+        position:"absolute",
+        borderRadius:500
+    },
+    midView:{
+        left:width/6,
+        top:height/12,
+        position:'absolute',
         justifyContent:'center',
-        alignItems:'center',
-        alignContent:'space-between'
+        alignItems:'center'
+    },
+    logo:{
+        height:0.20*275*width/376,
+        width:0.20*width
+    },
+    welcome:{
+        color:"#ffffff",
+        fontSize:0.07*width,
+        marginVertical:height/16
+    },
+    keyboardView:{
+        height:height/8
+    },
+    signInView:{
+        marginHorizontal:width/16
+    },
+    signIntext:{
+        fontSize:width/14,
+        color:"#3A3A3A",
+        fontWeight:'normal'
+    },
+    phonenumberView:{
+        marginVertical:height/18
+    },
+    phonenumberheading:{
+        fontStyle:'normal',
+        fontWeight:'bold',
+        fontSize:width/24,
+        color:"#b9b9b9"
+    },
+    phonenumberhorizaontalView:{
+        flexDirection:'row',
+        justifyContent:"space-between"
     },
     phonenumber:{
-        backgroundColor:"#020f2f",
-        width:300,
-        color:'#ffffff',
-        borderRadius:30,
-        marginBottom:50
+        fontSize:width/18,
+        color:"#3A3A3A",
+        borderBottomWidth:2,
+        borderColor:"#3E4DC8FF",
+        width:width/1.40,
+        letterSpacing:8
     },
-    button:{
-        backgroundColor:"#020f2f",
-        height:40,
-        width:200,
+    iconView:{
+        justifyContent:'center',
+        alignItems:"center",
+        marginRight:width/32
     },
-    buttontext:{
-        fontSize:16
+    touchableopacity:{
+        height:height/10,
+        justifyContent:"center"
+    },
+    touchableopacityView:{
+        flexDirection:"row",
+        marginHorizontal:width/12,
+        alignItems:'center',
+        justifyContent:"space-between"
+    },
+    getotp:{
+        color:"#ffffff",
+        fontSize:width/18
+    },
+    lineView:{
+        alignItems:'center',
+        justifyContent:'flex-end',
+        flex:1,
+        marginBottom:width/44
+    },
+    line:{
+        height:4,
+        width:width/3,
+        backgroundColor:"#000000",
+        borderRadius:100
     }
 });
 
