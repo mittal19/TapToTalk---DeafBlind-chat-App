@@ -2,18 +2,16 @@
 //then sending otp using fetch .. api is created...see expressbackend for api details.
 //if otp is sent then navigate to otp screen
 
-import React, { useState, useEffect, useRef } from 'react';
-import {View,Text,TextInput,TouchableOpacity,ToastAndroid,ActivityIndicator,Image,Keyboard,Animated} from 'react-native';
-import styles,{width,height} from './styling/style_userNumber';
+import React, { useState, useEffect } from 'react';
+import {View,Text,StatusBar,TextInput,TouchableOpacity,ToastAndroid,ActivityIndicator,Image,Dimensions,KeyboardAvoidingView,Keyboard} from 'react-native';
+import {styles} from './styling/style_userNumber';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/AntDesign';
 
-
+const {width, height} = Dimensions.get('window');
 
 export function component_userNumber({navigation})
 {
-  const fadeAnim = useRef(new Animated.Value(height/2)).current;
-
   useEffect(() => 
   {
     Keyboard.addListener("keyboardDidShow", _keyboardDidShow);
@@ -28,25 +26,10 @@ export function component_userNumber({navigation})
   }, []);
 
   const [keyboardStatus, setKeyboardStatus] = useState(false);
-
-  const _keyboardDidShow = () => 
-  {
-    setKeyboardStatus(true);
-    Animated.timing(fadeAnim,{
-      toValue:0,
-      duration:300,
-      useNativeDriver:false
-    }).start();
-  }
-  const _keyboardDidHide = () => 
-  {
-    setKeyboardStatus(false);
-    Animated.timing(fadeAnim,{
-      toValue:height/2,
-      duration:0,
-      useNativeDriver:false
-    }).start();
-  }
+  const _keyboardDidShow = () => setKeyboardStatus(true);
+  const _keyboardDidHide = () => setKeyboardStatus(false);
+  
+  console.log(width+" "+height);
 
   const [userNumber,set_userNumber] = React.useState('');    // state for holding phone number
   const [sendingOtp,set_sendingOtp] = React.useState(false);    // state for showing activity indicator
@@ -100,65 +83,45 @@ export function component_userNumber({navigation})
   }
 
   
-//in image 376 and 275 is width and height of logo   
+//in image 376 and 275 is width and height of logo   left:width/6,top:height/12,left:width/8,top:height/16+0.25*275*width/376+height/20,
   return(
-    <View style={styles.container}>
-        <View style={{}}>
-          <Animated.View style={[styles.upperCircle,{height:fadeAnim}]}>
-            {
-              keyboardStatus?
-              <View></View>  
-              :
-              <LinearGradient colors={["#C72FF8FF","#5264F9FF"]} style={styles.upperCircleGradient} />  
-            }
-          </Animated.View>
+    <View style={{flex:1,backgroundColor:"#ffffff"}}>
+      <StatusBar hidden = {true}/>  
+       {
+          keyboardStatus==false?
+            <View style={{height:height/2}}>
+              <View style={{height:height/2,width:height/2}}>
+                <LinearGradient colors={["#3E4DC8FF","#3E4DC8FF","#00FFFFFF","#00FFFFFF"]} style={{height:height/2,width:height/2,left:-width/40,top:-height/6,position:'absolute',borderRadius:500}} />
+              </View>
 
-          <Animated.View style={[styles.midCircle,{height:fadeAnim}]}>
-            {
-              keyboardStatus?
-              <View></View>  
-              :
-              <LinearGradient colors={["#5264F9BF","#3E4DC8E6"]} style={styles.midCircleGradient} />  
-            }
-          </Animated.View>
+              <View style={{height:height/2,width:height/2,position:'absolute'}}>
+                <LinearGradient colors={["#3E4DC8FF","#971ABFBF","#971ABFBF"]} style={{height:height/2,width:height/2,left:-width/10,top:-height/14,position:'absolute',borderRadius:500}} />
+              </View>
 
-          <Animated.View style={[styles.lowerCircle,{height:fadeAnim}]}>
-            {
-              keyboardStatus?
-              <View></View>  
-              :
-              <LinearGradient colors={["#5264F9FF","#3AF9EFFF"]} style={styles.lowerCircleGradient} />  
-            }
-          </Animated.View>
-          
-          {
-            keyboardStatus?
-            <View></View>
-            :
-            <View style={styles.midView}>
-              <Image style={styles.logo} source={require('./res/TapToTalk_5.png')}/>    
-              <Text style={styles.welcome}>Welcome</Text>
+              <View style={{height:height/2,width:height/2,position:"absolute"}}>
+                <LinearGradient colors={["#3E4DC8FF","#3E4DC8FF","#4AECEC80"]} style={{height:height/2,width:height/2,left:-width/6,top:-height/8,position:"absolute",borderRadius:500}} />
+              </View>
+              
+              <View style={{left:width/6,top:height/12,position:'absolute',justifyContent:'center',alignItems:'center'}}>
+                <Image style={{height:0.20*275*width/376,width:0.20*width}} source={require('./res/TapToTalk_5.png')}/>    
+                <Text style={{color:"#ffffff",fontSize:0.07*width,marginVertical:height/16}}>Welcome</Text>
+              </View>
             </View>
-          }
-        </View>
-    
-        {
-          keyboardStatus?
-          <View style={styles.keyboardView}></View>
           :
-          <View></View>
-        }
-        <View style={styles.signInView}>
+          <View style={{height:height/8}} />
+       }
 
-          <Text style={styles.signIntext}>Sign up</Text>
+        <View style={{marginHorizontal:width/16}}>
 
-          <View style={styles.phonenumberView}>
+          <Text style={{fontSize:width/14,color:"#3A3A3A",fontWeight:'normal'}}>Sign up</Text>
+
+          <View style={{marginVertical:height/18}}>
             
-            <Text style={styles.phonenumberheading}>Phone Number</Text>
+            <Text style={{fontStyle:'normal',fontWeight:'bold',fontSize:width/24,color:"#b9b9b9"}}>Phone Number</Text>
             
-            <View style={styles.phonenumberhorizontalView}>
+            <View style={{flexDirection:'row',justifyContent:"space-between"}}>
               <TextInput
-                style={styles.phonenumber}
+                style={{fontSize:width/18,color:"#3A3A3A",borderBottomWidth:2,borderColor:"#3E4DC8FF",width:width/1.40,letterSpacing:8}}
                 keyboardType='phone-pad'
                 value={userNumber}
                 onChangeText={set_userNumber}
@@ -166,8 +129,8 @@ export function component_userNumber({navigation})
                 />
                 {
                   (userNumber.length==10)?
-                  <View style={styles.iconView}>
-                    <Icon name="checkcircle" size={width/18} color="#C72FF8FF" />
+                  <View style={{justifyContent:'center',alignItems:"center",marginRight:width/32}}>
+                    <Icon name="checkcircle" size={width/18} color="#3E4DC8FF" style={{}} />
                   </View>
                   :
                   <View></View>
@@ -178,11 +141,11 @@ export function component_userNumber({navigation})
 
           <View style={{}}>
             
-            <LinearGradient colors={["#3E4DC880", "#3E4DC8FF", "#3E4DC8FF", "#3E4DC8FF"]} start={{x: 0, y: 0}} end={{x: 1, y: 1}} style={styles.getotpGradient} >
-              <TouchableOpacity style={styles.touchableopacity} onPress={function_sendOtp} >
-                <View style={styles.touchableopacityView}>
-                  <Text style={styles.getotp}>Get OTP</Text>
-                  <Icon name="arrowright" size={width/18} color="#ffffff"/>
+            <LinearGradient colors={["#3E4DC8FF", "#971ABFBF", "#00FFFFFF"]} start={{x: 0, y: 0}} end={{x: 1, y: 1}} style={{borderRadius:28}} >
+              <TouchableOpacity style={{height:height/10,justifyContent:"center"}} onPress={function_sendOtp} >
+                <View style={{flexDirection:"row",marginHorizontal:width/12,alignItems:'center',justifyContent:"space-between"}}>
+                  <Text style={{color:"#ffffff",fontSize:width/18}}>Get OTP</Text>
+                  <Icon name="arrowright" size={width/18} color="#ffffff" style={{}}/>
                 </View>
               </TouchableOpacity>
             </LinearGradient>   
@@ -190,8 +153,8 @@ export function component_userNumber({navigation})
           </View>
         </View>
 
-      <View style={styles.lineView}>
-        <View style={styles.line}></View>
+      <View style={{alignItems:'center',justifyContent:'flex-end',flex:1,marginBottom:width/44}}>
+        <View style={{height:4,width:width/3,backgroundColor:"#000000",borderRadius:100}}></View>
       </View>
 
     </View>
