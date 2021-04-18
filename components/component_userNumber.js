@@ -2,8 +2,8 @@
 //then sending otp using fetch .. api is created...see expressbackend for api details.
 //if otp is sent then navigate to otp screen
 
-import React from 'react';
-import {View,Text,TextInput,TouchableOpacity,ToastAndroid,ActivityIndicator,Image,Dimensions} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import {View,Text,TextInput,TouchableOpacity,ToastAndroid,ActivityIndicator,Image,Dimensions,KeyboardAvoidingView,Keyboard} from 'react-native';
 import {styles} from './styling/style_userNumber';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/AntDesign';
@@ -12,6 +12,22 @@ const {width, height} = Dimensions.get('window');
 
 export function component_userNumber({navigation})
 {
+  useEffect(() => 
+  {
+    Keyboard.addListener("keyboardDidShow", _keyboardDidShow);
+    Keyboard.addListener("keyboardDidHide", _keyboardDidHide);
+
+    // cleanup function
+    return () => 
+    {
+      Keyboard.removeListener("keyboardDidShow", _keyboardDidShow);
+      Keyboard.removeListener("keyboardDidHide", _keyboardDidHide);
+    };
+  }, []);
+
+  const [keyboardStatus, setKeyboardStatus] = useState(false);
+  const _keyboardDidShow = () => setKeyboardStatus(true);
+  const _keyboardDidHide = () => setKeyboardStatus(false);
   
   console.log(width+" "+height);
 
@@ -65,30 +81,47 @@ export function component_userNumber({navigation})
       </View>
     );
   }
-//in image 376 and 275 is width and height of logo
+
+  
+//in image 376 and 275 is width and height of logo   left:width/6,top:height/12,left:width/8,top:height/16+0.25*275*width/376+height/20,
   return(
     <View style={{flex:1,backgroundColor:"#ffffff"}}>
-        
-        <View style={{}}>
-          <LinearGradient colors={['#5264F9', '#5264df', '#C72FF899']} style={{height:height/2,width:width/1.1,left:-width/32,top:-height/8,position:'absolute',borderRadius:200}} />
-          <View style={{height:height/2,width:width/1.1,left:-width/32,top:-height/8,borderRadius:200}}></View>
-          <LinearGradient colors={['#5264F9', '#5264e0', '#d33af9a9']} style={{height:height/2,width:width/1.1,left:-width/8,top:-height/12,position:'absolute',borderRadius:200}} />
-          <View style={{height:height/2,width:width/1.1,left:-width/8,top:-height/12,borderRadius:200,position:'absolute'}}></View>
-          <LinearGradient colors={['#5264F9', '#5264ff', '#3af9ef99']} style={{height:height/2,width:width/1.1,left:-width/4,top:-height/8,position:'absolute',borderRadius:200}} />
-          <View style={{height:height/2,width:width/1.1,left:-width/4,top:-height/8,borderRadius:200,position:"absolute"}}></View>  
-          
-          <Image style={{height:0.25*275*width/376,width:0.25*width,left:width/8,top:height/16,position:'absolute'}} source={require('./res/TapToTalk_5.png')}/>    
-          <Text style={{left:width/8,top:height/16+0.25*275*width/376+height/20,position:'absolute',color:"#ffffff",fontSize:0.07*width,fontFamily:"Montserrat-Thin"}}>Welcome</Text>      
-        </View>
-        
 
-        <View style={{marginHorizontal:30}}>
-          <Text style={{fontSize:32,color:"#3a3a3a"}}>Sign up</Text>
-          <View style={{marginVertical:24}}>
-            <Text style={{fontStyle:'normal',fontWeight:"normal",fontSize:16,color:"#b9b9b9"}}>Phone Number</Text>
+       {
+          keyboardStatus==false?
+            <View style={{height:height/2}}>
+              <View style={{height:height/2,width:height/2}}>
+                <LinearGradient colors={["#3E4DC8FF","#3E4DC8FF","#00FFFFFF","#00FFFFFF"]} style={{height:height/2,width:height/2,left:-width/40,top:-height/6,position:'absolute',borderRadius:500}} />
+              </View>
+
+              <View style={{height:height/2,width:height/2,position:'absolute'}}>
+                <LinearGradient colors={["#3E4DC8FF","#971ABFBF","#971ABFBF"]} style={{height:height/2,width:height/2,left:-width/10,top:-height/14,position:'absolute',borderRadius:500}} />
+              </View>
+
+              <View style={{height:height/2,width:height/2,position:"absolute"}}>
+                <LinearGradient colors={["#3E4DC8FF","#3E4DC8FF","#4AECEC80"]} style={{height:height/2,width:height/2,left:-width/6,top:-height/8,position:"absolute",borderRadius:500}} />
+              </View>
+              
+              <View style={{left:width/6,top:height/12,position:'absolute',justifyContent:'center',alignItems:'center'}}>
+                <Image style={{height:0.20*275*width/376,width:0.20*width}} source={require('./res/TapToTalk_5.png')}/>    
+                <Text style={{color:"#ffffff",fontSize:0.07*width,marginVertical:height/16}}>Welcome</Text>
+              </View>
+            </View>
+          :
+          <View style={{height:height/8}} />
+       }
+
+        <View style={{marginHorizontal:width/16}}>
+
+          <Text style={{fontSize:width/14,color:"#3A3A3A",fontWeight:'normal'}}>Sign up</Text>
+
+          <View style={{marginVertical:height/18}}>
+            
+            <Text style={{fontStyle:'normal',fontWeight:'bold',fontSize:width/24,color:"#b9b9b9"}}>Phone Number</Text>
+            
             <View style={{flexDirection:'row',justifyContent:"space-between"}}>
               <TextInput
-                style={{fontSize:20,color:"#000000",borderBottomWidth:2,borderColor:"#5264F9",width:300,letterSpacing:2}}
+                style={{fontSize:width/18,color:"#3A3A3A",borderBottomWidth:2,borderColor:"#3E4DC8FF",width:width/1.40,letterSpacing:8}}
                 keyboardType='phone-pad'
                 value={userNumber}
                 onChangeText={set_userNumber}
@@ -96,85 +129,34 @@ export function component_userNumber({navigation})
                 />
                 {
                   (userNumber.length==10)?
-                  <View style={{justifyContent:'center',alignItems:"center",marginRight:10}}>
-                    <Icon name="checkcircle" size={20} color="#5264F9" style={{}} />
+                  <View style={{justifyContent:'center',alignItems:"center",marginRight:width/32}}>
+                    <Icon name="checkcircle" size={width/18} color="#3E4DC8FF" style={{}} />
                   </View>
                   :
                   <View></View>
                 }            
             </View>
+
           </View>
-          <View style={{marginTop:30}}>
-            <LinearGradient colors={['#5264F9', '#5264ff', '#3af9ef99']} start={{x: 0, y: 0}} end={{x: 1, y: 1}} style={{borderRadius:28}} >
-              <TouchableOpacity style={{height:72,justifyContent:"center"}} onPress={function_sendOtp} >
-                <View style={{flexDirection:"row",marginHorizontal:40,justifyContent:"space-between"}}>
-                  <Text style={{color:"#ffffff",fontSize:24}}>Get OTP</Text>
-                  <Icon name="arrowright" size={28} color="#ffffff" style={{}}/>
+
+          <View style={{}}>
+            
+            <LinearGradient colors={["#3E4DC8FF", "#971ABFBF", "#00FFFFFF"]} start={{x: 0, y: 0}} end={{x: 1, y: 1}} style={{borderRadius:28}} >
+              <TouchableOpacity style={{height:height/10,justifyContent:"center"}} onPress={function_sendOtp} >
+                <View style={{flexDirection:"row",marginHorizontal:width/12,alignItems:'center',justifyContent:"space-between"}}>
+                  <Text style={{color:"#ffffff",fontSize:width/18}}>Get OTP</Text>
+                  <Icon name="arrowright" size={width/18} color="#ffffff" style={{}}/>
                 </View>
               </TouchableOpacity>
             </LinearGradient>   
+          
           </View>
         </View>
-        <View style={{alignItems:'center',justifyContent:'flex-end',flex:1,marginVertical:10}}>
-          <View style={{height:2,width:140,backgroundColor:"#000000",borderRadius:100}}></View>
-        </View>
+
+      <View style={{alignItems:'center',justifyContent:'flex-end',flex:1,marginBottom:width/44}}>
+        <View style={{height:4,width:width/3,backgroundColor:"#000000",borderRadius:100}}></View>
+      </View>
+
     </View>
   );
-
 }
-
-/*
-
-<View style={{}}>
-          <Text style={{width:101,height:34,fontSize:28,color:"#3a3a3a",lineHeight:34,fontWeight:"700"}}>Sign in</Text>
-          
-          <View style={{width:314,height:58}}>
-            <Text style={{width:101,height:17,fontStyle:'normal',fontWeight:"normal",fontSize:14,lineHeight:17,color:"#b9b9b9"}}>Phone Number</Text>
-            <TextInput
-              style={{fontWeight:"900",color:"#000000",borderBottomWidth:1,borderColor:"#2743fd"}}
-              placeholderTextColor="white"
-              keyboardType='phone-pad'
-              value={userNumber}
-              onChangeText={set_userNumber}
-              maxLength={10}
-            />
-          </View>
-          
-          <View>
-            <TouchableOpacity onPress={function_sendOtp}>
-              <Text>Send OTP</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-
-
-
-<View>
-        <View style={{height:352,width:352,left:-12,top:-106,borderRadius:500,backgroundColor:"#5263f9",position:"absolute"}}>
-        </View>
-        <View style={{height:352,width:352,left:-43,top:-56,borderRadius:500,backgroundColor:"#5264f9",position:"absolute"}}>
-        </View>
-        <View style={{height:352,width:352,left:-74,top:-84,borderRadius:500,backgroundColor:"#3af9ef",position:"absolute"}}>
-        </View>
-      </View>
-      <View style={{}}>
-        <Text>fad</Text>
-      </View>
-
-<Image style={{height:59,width:60,top:64,left:52}} source={require('./res/logo.png')} />
-        <Text  style={{height:61,width:136,top:100,left:52,fontSize:30,color:"#ffffff",fontStyle:"normal"}}>Welcome</Text>
-
-<TextInput
-        style={styles.phonenumber}
-        placeholder="Enter 10 digit Phone number"
-        placeholderTextColor="white"
-        keyboardType='phone-pad'
-        value={userNumber}
-        onChangeText={set_userNumber}
-        maxLength={10}
-      />
-      <TouchableOpacity style={styles.button} onPress={function_sendOtp}>
-        <Text style={styles.buttontext} >Send OTP</Text>
-      </TouchableOpacity>
-      */
