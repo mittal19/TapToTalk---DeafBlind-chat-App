@@ -7,7 +7,7 @@
 import React,{useEffect,useState,useRef} from 'react';
 import {View,Text,TouchableOpacity,ToastAndroid,Image,Keyboard,Animated, Easing,KeyboardAvoidingView} from 'react-native';
 import OTPInputView from '@twotalltotems/react-native-otp-input';
-import {styles} from './styling/style_otp';
+import styles,{width,height} from './styling/style_otp';
 import LinearGradient from 'react-native-linear-gradient';
 
 export function component_otp({route,navigation}) 
@@ -26,13 +26,13 @@ export function component_otp({route,navigation})
 
   const [keyboardStatus,setKeyboardStatus] = useState(false);
 
-  const sizeAnimation = useRef(new Animated.Value(224)).current;
+  const sizeAnimation = useRef(new Animated.Value(width/2)).current;
 
   const _keyboardDidShow = () => 
   {
     setKeyboardStatus(true);
     Animated.timing(sizeAnimation,{
-      toValue:80,
+      toValue:width/5,
       timing:0,
       useNativeDriver:false
     }).start();
@@ -42,7 +42,7 @@ export function component_otp({route,navigation})
   {
     setKeyboardStatus(false);
     Animated.timing(sizeAnimation,{
-      toValue:224,
+      toValue:width/2,
       timing:0,
       useNativeDriver:false
     }).start();
@@ -109,27 +109,29 @@ export function component_otp({route,navigation})
   }
 
   return(
-    <View style={{backgroundColor:"#ffffff",flex:1}}>
+    <View style={styles.container}>
       
-      <View style={{justifyContent:'center',alignItems:'center',marginVertical:40}}>
+      <View style={styles.otpimageView}>
         <Animated.Image source={require('./res/otp.png')} style={[styles.otpimageBig,{height:sizeAnimation,width:sizeAnimation}]}/>
       </View>
 
-      <View style={{flex:2}}>
+      <View style={styles.midView}>
         
-        <View style={{alignItems:'center'}}>
-          <Text style={{fontSize:28}}>OTP Verification</Text>
+        <View style={styles.otpenterView}>
+
+          <Text style={styles.otpverification}>OTP Verification</Text>
+          
           <View style={keyboardStatus?styles.smallenterotpheading:styles.bigenterotpheading}>
-            <Text style={{fontSize:16}}>Enter OTP sent to </Text>
-            <Text style={{fontSize:16,fontWeight:'bold'}}>+91 {userNumber}</Text>
+            <Text style={styles.otpsentto}>Enter OTP sent to </Text>
+            <Text style={[styles.otpsentto,{fontWeight:'bold'}]}>+91 {userNumber}</Text>
           </View>
           
           <OTPInputView
-            style={{width: 300, height: 60}} 
+            style={styles.otpinputView} 
             pinCount={4}
             keyboardType="phone-pad"
-            codeInputFieldStyle={{width:48,height:48,borderWidth:0,borderBottomWidth:2,color:'#000000',borderColor:'#3E4DC8',fontSize:24}}
-            codeInputHighlightStyle={{borderColor: "#000000"}}
+            codeInputFieldStyle={styles.codeInputFieldStyle}
+            codeInputHighlightStyle={styles.codeInputHighlightStyle}
             onCodeFilled = {(code) => {
               set_otp(code);
             }}
@@ -139,8 +141,8 @@ export function component_otp({route,navigation})
             keyboardStatus?
             <View></View>
             :
-            <TouchableOpacity onPress={function_otpNotRecieved} style={{marginVertical:32}}>
-            <Text style={{fontSize:18,color:"#3E4DC8"}}>Did not recieved the OTP?</Text>
+            <TouchableOpacity onPress={function_otpNotRecieved} style={styles.touchableopacitydidnotrecieved}>
+              <Text style={styles.didnotrecieved}>Did not recieved the OTP?</Text>
             </TouchableOpacity>
           }
           
