@@ -34,7 +34,7 @@ export function component_userNumber({navigation})
     setKeyboardStatus(true);
     Animated.timing(fadeAnim,{
       toValue:0,
-      duration:300,
+      duration:150,
       useNativeDriver:false
     }).start();
   }
