@@ -4,12 +4,30 @@
 //otp entered is checked by the api created ..check express backend for details
 //if otp is correct navigate to user details screen else show error and re try.
 
-import React from 'react';
-import {View,Text,TouchableOpacity,ToastAndroid} from 'react-native';
+import React,{useEffect,useState} from 'react';
+import {View,Text,TouchableOpacity,ToastAndroid,Image,Keyboard} from 'react-native';
 import OTPInputView from '@twotalltotems/react-native-otp-input';
+import {styles} from './styling/style_otp';
+import LinearGradient from 'react-native-linear-gradient';
 
 export function component_otp({route,navigation}) 
 {
+  useEffect(()=>
+  {
+    Keyboard.addListener("keyboardDidShow",_keyboardDidShow);
+    Keyboard.addListener("keyboardDidHide",_keyboardDidHide);
+
+    return()=>
+    {
+      Keyboard.removeListener("keyboardDidShow",_keyboardDidShow);
+      Keyboard.removeListener("keyboardDidHide",_keyboardDidHide);
+    };
+  },[]);
+
+  const [keyboardStatus,setKeyboardStatus] = useState(false);
+  const _keyboardDidShow = () => setKeyboardStatus(true);
+  const _keyboardDidHide = () => setKeyboardStatus(false);
+
   const {userNumber,requestId} = route.params;       // getting info from previous screen
   const [otp,set_otp] = React.useState('');         //this will store the user entered otp 
 
@@ -71,24 +89,71 @@ export function component_otp({route,navigation})
   }
 
   return(
-    <View>
-       <Text>Enter OTP</Text>
-        <OTPInputView
-          style={{width: '80%', height: 200}} 
-          pinCount={4}
-          autoFocusOnLoad
-          keyboardType="phone-pad"
-          codeInputFieldStyle={{width:30,height: 45,borderWidth: 0,borderBottomWidth: 1,color:'#000000'}}
-          codeInputHighlightStyle={{borderColor: "#000000"}}
-          onCodeFilled = {(code) => {
-            set_otp(code);
-          }}
-          />
+    <View style={{backgroundColor:"#ffffff",flex:1}}>
+      
+      {
+        keyboardStatus?
+        <View style={{flex:1,justifyContent:'center',alignItems:'center',marginVertical:16}}>
+          <Image source={require('./res/otp.png')} style={{height:120,width:120}}/>
+        </View>
+        :
+        <View style={{flex:1,justifyContent:'center',alignItems:'center',marginVertical:48}}>
+          <Image source={require('./res/otp.png')} style={{height:223,width:223}}/>
+        </View>
+      }
 
-        <TouchableOpacity onPress={function_checkOtp}><Text>Next</Text></TouchableOpacity>
-        <Text>OR</Text>
-        <TouchableOpacity onPress={function_otpNotRecieved}><Text>Didn't recieved OTP on {userNumber} ?</Text></TouchableOpacity>
- 
+      <View style={{flex:2}}>
+        
+        <View style={{alignItems:'center'}}>
+          {
+            keyboardStatus?
+            <Text style={{fontSize:28}}>OTP Verification</Text>
+            :
+            <Text style={{fontSize:28}}>OTP Verification</Text>
+          }
+          <View style={{flexDirection:'row',marginVertical:24}}>
+            <Text style={{fontSize:16}}>Enter OTP sent to </Text>
+            <Text style={{fontSize:16,fontWeight:'bold'}}>+91 {userNumber}</Text>
+          </View>
+          
+          <OTPInputView
+            style={{width: 300, height: 60}} 
+            pinCount={4}
+            keyboardType="phone-pad"
+            codeInputFieldStyle={{width:48,height:48,borderWidth:0,borderBottomWidth:2,color:'#000000',borderColor:'#3E4DC8',fontSize:24}}
+            codeInputHighlightStyle={{borderColor: "#000000"}}
+            onCodeFilled = {(code) => {
+              set_otp(code);
+            }}
+          />
+          
+          {
+            keyboardStatus?
+            <View></View>
+            :
+            <TouchableOpacity onPress={function_otpNotRecieved} style={{marginVertical:32}}>
+            <Text style={{fontSize:18,color:"#3E4DC8"}}>Did not recieved the OTP?</Text>
+            </TouchableOpacity>
+          }
+          
+        </View>
+
+        <View style={{marginHorizontal:24}}>
+          <LinearGradient colors={["#3E4DC880", "#3E4DC8FF", "#3E4DC8FF", "#3E4DC8FF"]} start={{x: 0, y: 0}} end={{x: 1, y: 1}} style={styles.verifyotpGradient} >
+            <TouchableOpacity style={styles.touchableopacity} onPress={function_checkOtp} >
+              <View style={styles.touchableopacityView}>
+                <Text style={styles.verifyotp}>Verify OTP</Text>
+              </View>
+            </TouchableOpacity>
+          </LinearGradient>
+        </View>
+
+      </View>
+      
+      <View style={styles.lineView}>
+        <View style={styles.line}></View>
+      </View>
+      
     </View>
   );
 

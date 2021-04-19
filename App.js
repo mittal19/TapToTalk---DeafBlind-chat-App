@@ -115,17 +115,17 @@ function App()
       {loginState.userNumber == null ?  
         <Stack.Navigator>
           <Stack.Screen name="Phone Number" component={component_userNumber} options={{headerShown: false}} />
-          <Stack.Screen name="OTP" component={component_otp} />
-          <Stack.Screen name="EnterDetails" component={component_userDetails} />
-          <Stack.Screen name="Select image" component={component_selectProfile} />
-          <Stack.Screen name="Save Profile" component={component_saveProfile} />
+          <Stack.Screen name="OTP" component={component_otp} options={{headerShown: false}}/>
+          <Stack.Screen name="EnterDetails" component={component_userDetails} options={{headerShown: false}}/>
+          <Stack.Screen name="Select image" component={component_selectProfile} options={{headerShown: false}}/>
+          <Stack.Screen name="Save Profile" component={component_saveProfile} options={{headerShown: false}}/>
         </Stack.Navigator>
         :
         <Stack.Navigator> 
               
-          <Stack.Screen name="Home" component={component_home} />
-          <Stack.Screen name="Contacts" component={component_contacts} />
-          <Stack.Screen name="Message" component={component_message} />
+          <Stack.Screen name="Home" component={component_home} options={{headerShown: false}}/>
+          <Stack.Screen name="Contacts" component={component_contacts} options={{headerShown: false}}/>
+          <Stack.Screen name="Message" component={component_message} options={{headerShown: false}}/>
         </Stack.Navigator>
       }
       </NavigationContainer>

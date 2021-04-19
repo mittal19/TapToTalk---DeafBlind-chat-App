@@ -35,7 +35,7 @@ export function component_userNumber({navigation})
     Animated.timing(fadeAnim,{
       toValue:0,
       duration:150,
-      useNativeDriver:false
+      useNativeDriver:false,
     }).start();
   }
   const _keyboardDidHide = () => 
