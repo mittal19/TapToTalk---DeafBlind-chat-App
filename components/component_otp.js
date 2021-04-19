@@ -4,8 +4,8 @@
 //otp entered is checked by the api created ..check express backend for details
 //if otp is correct navigate to user details screen else show error and re try.
 
-import React,{useEffect,useState} from 'react';
-import {View,Text,TouchableOpacity,ToastAndroid,Image,Keyboard} from 'react-native';
+import React,{useEffect,useState,useRef} from 'react';
+import {View,Text,TouchableOpacity,ToastAndroid,Image,Keyboard,Animated, Easing,KeyboardAvoidingView} from 'react-native';
 import OTPInputView from '@twotalltotems/react-native-otp-input';
 import {styles} from './styling/style_otp';
 import LinearGradient from 'react-native-linear-gradient';
@@ -25,8 +25,28 @@ export function component_otp({route,navigation})
   },[]);
 
   const [keyboardStatus,setKeyboardStatus] = useState(false);
-  const _keyboardDidShow = () => setKeyboardStatus(true);
-  const _keyboardDidHide = () => setKeyboardStatus(false);
+
+  const sizeAnimation = useRef(new Animated.Value(224)).current;
+
+  const _keyboardDidShow = () => 
+  {
+    setKeyboardStatus(true);
+    Animated.timing(sizeAnimation,{
+      toValue:80,
+      timing:0,
+      useNativeDriver:false
+    }).start();
+  }
+
+  const _keyboardDidHide = () => 
+  {
+    setKeyboardStatus(false);
+    Animated.timing(sizeAnimation,{
+      toValue:224,
+      timing:0,
+      useNativeDriver:false
+    }).start();
+  }
 
   const {userNumber,requestId} = route.params;       // getting info from previous screen
   const [otp,set_otp] = React.useState('');         //this will store the user entered otp 
@@ -91,27 +111,15 @@ export function component_otp({route,navigation})
   return(
     <View style={{backgroundColor:"#ffffff",flex:1}}>
       
-      {
-        keyboardStatus?
-        <View style={{flex:1,justifyContent:'center',alignItems:'center',marginVertical:16}}>
-          <Image source={require('./res/otp.png')} style={{height:120,width:120}}/>
-        </View>
-        :
-        <View style={{flex:1,justifyContent:'center',alignItems:'center',marginVertical:48}}>
-          <Image source={require('./res/otp.png')} style={{height:223,width:223}}/>
-        </View>
-      }
+      <View style={{justifyContent:'center',alignItems:'center',marginVertical:40}}>
+        <Animated.Image source={require('./res/otp.png')} style={[styles.otpimageBig,{height:sizeAnimation,width:sizeAnimation}]}/>
+      </View>
 
       <View style={{flex:2}}>
         
         <View style={{alignItems:'center'}}>
-          {
-            keyboardStatus?
-            <Text style={{fontSize:28}}>OTP Verification</Text>
-            :
-            <Text style={{fontSize:28}}>OTP Verification</Text>
-          }
-          <View style={{flexDirection:'row',marginVertical:24}}>
+          <Text style={{fontSize:28}}>OTP Verification</Text>
+          <View style={keyboardStatus?styles.smallenterotpheading:styles.bigenterotpheading}>
             <Text style={{fontSize:16}}>Enter OTP sent to </Text>
             <Text style={{fontSize:16,fontWeight:'bold'}}>+91 {userNumber}</Text>
           </View>
@@ -138,7 +146,7 @@ export function component_otp({route,navigation})
           
         </View>
 
-        <View style={{marginHorizontal:24}}>
+        <View style={keyboardStatus?styles.touchableopacityViewKeyboardShow:styles.touchableopacityViewKeyboardHide}>
           <LinearGradient colors={["#3E4DC880", "#3E4DC8FF", "#3E4DC8FF", "#3E4DC8FF"]} start={{x: 0, y: 0}} end={{x: 1, y: 1}} style={styles.verifyotpGradient} >
             <TouchableOpacity style={styles.touchableopacity} onPress={function_checkOtp} >
               <View style={styles.touchableopacityView}>
