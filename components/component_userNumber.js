@@ -78,6 +78,7 @@ export function component_userNumber({navigation})
         console.log(requestId);*/
         const requestId = 24325;   //temporary  will be removed when above code is uncommented
         ToastAndroid.show("OTP sent",ToastAndroid.SHORT);  //otp sent success
+        Keyboard.dismiss();
         set_sendingOtp(false);     //now setting activityindicator to false n thus hiding it.
         navigation.navigate('OTP',{userNumber:userNumber,requestId:requestId["requestId"]});      //navigating to OTP screen. passing some information like phonenumber and requestID to next screen
       }
@@ -157,6 +158,7 @@ export function component_userNumber({navigation})
             <Text style={styles.phonenumberheading}>Phone Number</Text>
             
             <View style={styles.phonenumberhorizontalView}>
+              
               <TextInput
                 style={styles.phonenumber}
                 keyboardType='phone-pad'
