@@ -4,6 +4,7 @@ const firebaseConfig =
 {
   apiKey: "AIzaSyCRwGrxtIwiURawt8bTjJqwNffdAlPu4Qc",
   authDomain: "taptotalk-ce0f0.firebaseapp.com",
+  databaseURL: "https://taptotalk-ce0f0-default-rtdb.firebaseio.com",
   projectId: "taptotalk-ce0f0",
   storageBucket: "taptotalk-ce0f0.appspot.com",
   messagingSenderId: "694469466212",
