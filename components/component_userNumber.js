@@ -56,7 +56,7 @@ export function component_userNumber({navigation})
 
     if( !(/^\d+$/.test(userNumber)) || userNumber.length<10 )       //checking validity of phone number
     {  
-      ToastAndroid.show("Enter a number with 10 digits only!", ToastAndroid.LONG);    //showing toast if entered number is not properly formatted
+      ToastAndroid.show("Enter a number with 10 digits only!", ToastAndroid.SHORT);    //showing toast if entered number is not properly formatted
     }
     else   //if number is formatted right
     {
@@ -86,7 +86,7 @@ export function component_userNumber({navigation})
       { 
         console.log(err);            
         set_sendingOtp(false);        //hiding activity indicator
-        ToastAndroid.show("Some error occurred. Try again.",ToastAndroid.LONG);  //toasting error
+        ToastAndroid.show("Some error occurred. Try again.",ToastAndroid.SHORT);  //toasting error
       }
     }
   }

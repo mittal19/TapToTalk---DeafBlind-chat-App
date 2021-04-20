@@ -1,27 +1,74 @@
 import {StyleSheet, Dimensions} from 'react-native';
 
-const {width, height} = Dimensions.get('window');
-
-const styles = StyleSheet.create({
+export const {width, height} = Dimensions.get('window');
+console.log(height+" "+width);
+export default StyleSheet.create({
+    container:{
+        backgroundColor:"#ffffff",
+        flex:1
+    },
+    otpimageView:{
+        justifyContent:'center',
+        alignItems:'center',
+        marginVertical:height/18
+    },
     otpimageBig:{
-        height:223,
-        width:223
+        height:width/2,
+        width:width/2
+    },
+    midView:{
+        flex:2
+    },
+    otpenterView:{
+        alignItems:'center'
+    },
+    otpverification:{
+        fontSize:width/16,
+        fontFamily:'Montserrat-Regular'
     },
     smallenterotpheading:{
         flexDirection:'row',
-        marginTop:8,
-        marginBottom:16
+        marginTop:height/48,
+        marginBottom:height/32
     },
     bigenterotpheading:{
         flexDirection:'row',
-        marginVertical:24
+        marginVertical:height/30,
+    },
+    otpsentto:{
+        fontSize:width/26
+    },
+    otpinputView:{
+        width: width/1.40, 
+        height: width/8
+    },
+    codeInputFieldStyle:{
+        width:width/8,
+        height:width/6,
+        borderWidth:0,
+        borderBottomWidth:2,
+        color:'#000000',
+        borderColor:'#3E4DC8',
+        fontSize:width/14,
+        fontFamily:'Montserrat-Medium'
+    },
+    codeInputHighlightStyle:{
+        borderColor:"#000000"
+    },
+    didnotrecieved:{
+        fontSize:width/24,
+        color:"#3E4DC8",
+        fontFamily:'Montserrat-SemiBold'
+    },
+    touchableopacitydidnotrecieved:{
+        marginVertical:height/18
     },
     touchableopacityViewKeyboardShow:{
-        marginHorizontal:24,
-        marginTop:24
+        marginHorizontal:width/18,
+        marginTop:height/26
     },
-    touchableopacityViewvKeyboardHide:{
-        marginHorizontal:24
+    touchableopacityViewKeyboardHide:{
+        marginHorizontal:width/18
     },
     verifyotpGradient:{
         borderRadius:28
@@ -35,7 +82,8 @@ const styles = StyleSheet.create({
     },
     verifyotp:{
         color:"#ffffff",
-        fontSize:width/18
+        fontSize:width/18,
+        fontFamily:'Montserrat-Regular'
     },
     lineView:{
         alignItems:'center',
@@ -49,5 +97,3 @@ const styles = StyleSheet.create({
         borderRadius:100
     }
 });
-
-exports.styles = styles;

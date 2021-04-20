@@ -78,33 +78,30 @@ function App()
     }),[]);
 
     useEffect(()=>  //this will be automattically called is similar to component did mount
-    {       
+    {            
+      setTimeout(async()=>
+      {
         let userNumber = null;      //these variales will store data from local storage  
         let userName = null;
         let userState = null;
         
-        async function gettingDatafromStorage()
+        try
         {
-            try
-            {
-                userNumber = await AsyncStorage.getItem('userNumber');      //getting phonenumber,name,profile,status from storage
-                userName = await AsyncStorage.getItem('userName');
-                userState = await AsyncStorage.getItem('userState');
-            }
-            catch(e)
-            {
-                console.log(e);       //showing error
-            }
+          userNumber = await AsyncStorage.getItem('userNumber');      //getting phonenumber,name,profile,status from storage
+          userName = await AsyncStorage.getItem('userName');
+          userState = await AsyncStorage.getItem('userState');
         }
-        gettingDatafromStorage();
-
-        dispatch({type:'RETRIEVE_STORED_DATA',userNumber:userNumber,userName:userName,userState:userState});        //calling dispatcher action for setting the data retrived ... this action is in ./helpers/Reduceractions 
-        
-        setTimeout(()=>
+        catch(e)
         {
-          SplashScreen.hide();
-        },1000);
+          console.log(e);       //showing error
+        }
         
+        dispatch({type:'RETRIEVE_STORED_DATA',userNumber:userNumber,userName:userName,userState:userState});        //calling dispatcher action for setting the data retrived ... this action is in ./helpers/Reduceractions 
+        setTimeout(()=>{
+          SplashScreen.hide()
+        },1000);
+      },0);    //settime out of 1000ms is just for showing splash screen
+  
     },[]);
 
   //if userNumber is null then show login process else show loggedin screens 
