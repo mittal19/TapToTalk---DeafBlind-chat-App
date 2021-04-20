@@ -49,11 +49,10 @@ export default StyleSheet.create({
         borderRadius:500
     },
     midView:{
-        left:width/6,
+        left:width/8,
         top:height/12,
         position:'absolute',
-        justifyContent:'center',
-        alignItems:'center'
+        justifyContent:'center'
     },
     logo:{
         height:0.20*275*width/376,
@@ -73,28 +72,29 @@ export default StyleSheet.create({
     signIntext:{
         fontSize:width/14,
         color:"#3A3A3A",
-        fontWeight:'normal'
+        fontFamily:'Montserrat-Regular'
     },
     phonenumberView:{
         marginVertical:height/18
     },
     phonenumberheading:{
-        fontStyle:'normal',
-        fontWeight:'bold',
-        fontSize:width/24,
+        fontFamily:'Montserrat-SemiBold',
+        fontSize:width/22,
         color:"#b9b9b9"
     },
     phonenumberhorizontalView:{
         flexDirection:'row',
-        justifyContent:"space-between"
+        justifyContent:"space-between",
+        marginTop:height/80
     },
     phonenumber:{
         fontSize:width/18,
-        color:"#3A3A3A",
+        color:"#000000",
         borderBottomWidth:2,
         borderColor:"#3E4DC8FF",
         width:width/1.40,
-        letterSpacing:8
+        letterSpacing:8,
+        fontFamily:'Montserrat-Medium'
     },
     iconView:{
         justifyContent:'center',
@@ -116,7 +116,8 @@ export default StyleSheet.create({
     },
     getotp:{
         color:"#ffffff",
-        fontSize:width/18
+        fontSize:width/18,
+        fontFamily:'Montserrat-Regular'
     },
     lineView:{
         alignItems:'center',

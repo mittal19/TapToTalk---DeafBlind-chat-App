@@ -23,7 +23,8 @@ export default StyleSheet.create({
         alignItems:'center'
     },
     otpverification:{
-        fontSize:width/16
+        fontSize:width/16,
+        fontFamily:'Montserrat-Regular'
     },
     smallenterotpheading:{
         flexDirection:'row',
@@ -48,17 +49,19 @@ export default StyleSheet.create({
         borderBottomWidth:2,
         color:'#000000',
         borderColor:'#3E4DC8',
-        fontSize:width/14
+        fontSize:width/14,
+        fontFamily:'Montserrat-Medium'
     },
     codeInputHighlightStyle:{
         borderColor:"#000000"
     },
     didnotrecieved:{
         fontSize:width/24,
-        color:"#3E4DC8"  
+        color:"#3E4DC8",
+        fontFamily:'Montserrat-SemiBold'
     },
     touchableopacitydidnotrecieved:{
-        marginVertical:height/22
+        marginVertical:height/18
     },
     touchableopacityViewKeyboardShow:{
         marginHorizontal:width/18,
@@ -79,7 +82,8 @@ export default StyleSheet.create({
     },
     verifyotp:{
         color:"#ffffff",
-        fontSize:width/18
+        fontSize:width/18,
+        fontFamily:'Montserrat-Regular'
     },
     lineView:{
         alignItems:'center',
