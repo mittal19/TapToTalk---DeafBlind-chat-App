@@ -53,7 +53,7 @@ export function component_otp({route,navigation})
 
   const function_otpNotRecieved=()=>        //this function gets executed when user press otp not recieved 
   {         
-    ToastAndroid.show('Enter phone number and Try Again',ToastAndroid.LONG);       //showing toast
+    ToastAndroid.show('Enter phone number and Try Again',ToastAndroid.SHORT);       //showing toast
     navigation.goBack();      // going back to previous screen which is phonenumber component
   }
 
@@ -87,24 +87,24 @@ export function component_otp({route,navigation})
         }
         else if(res.status==16&&res.error_text=="The code provided does not match the expected value")
         {
-          ToastAndroid.show("Wrong OTP entered! Try again.",ToastAndroid.LONG);     //wrong OTP  //re enter
+          ToastAndroid.show("Wrong OTP entered! Try again.",ToastAndroid.SHORT);     //wrong OTP  //re enter
         }
         else
         {
-          ToastAndroid.show("Some error occured! Try again,",ToastAndroid.LONG);   //error occurred while checking otp
+          ToastAndroid.show("Some error occured! Try again,",ToastAndroid.SHORT);   //error occurred while checking otp
           navigation.goBack();     //go back n try again
         }
 
       }
       catch(error)
       {
-        ToastAndroid.show("Some error occurred! Try again,",ToastAndroid.LONG);
+        ToastAndroid.show("Some error occurred! Try again,",ToastAndroid.SHORT);
         navigation.goBack();  //error occurred . go back n try again
       }
     }
     else
     {
-      ToastAndroid.show('Enter all 4 digits',ToastAndroid.LONG); //showing toast to enter proper otp.
+      ToastAndroid.show('Enter all 4 digits',ToastAndroid.SHORT); //showing toast to enter proper otp.
     }
   }
 
