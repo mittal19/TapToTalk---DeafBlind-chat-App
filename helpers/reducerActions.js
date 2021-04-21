@@ -9,7 +9,8 @@ const Reduceractions = (prevState,action)=>
         isLoading:false,         
         userNumber:action.userNumber,    //setting phone number
         userName:action.userName,
-        userState:action.userState
+        userState:action.userState,
+        userProfile:action.userProfile
       };
 
     case 'LOGIN':          //when userdetails are filled this is called
@@ -18,7 +19,8 @@ const Reduceractions = (prevState,action)=>
         isLoading:false,
         userNumber:action.userNumber,    //setting phone number
         userName:action.userName,
-        userState:action.userState
+        userState:action.userState,
+        userProfile:action.userProfile
       };
       
     case 'LOGOUT':                //when logging out this is called
@@ -27,7 +29,8 @@ const Reduceractions = (prevState,action)=>
         isLoading:false,
         userNumber:null,
         userName:null,
-        userState:null
+        userState:null,
+        userProfile:null
       };
   }
 };
