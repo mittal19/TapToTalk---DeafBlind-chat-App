@@ -18,6 +18,7 @@ export function component_saveProfile({route,navigation})
         {
             console.log("in2");
             const resp = await storage().ref(nameoffile).putFile(uri);
+            console.log(resp);
             if(resp["state"]=="success")
             { 
                 console.log("in3");  

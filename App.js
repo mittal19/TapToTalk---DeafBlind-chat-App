@@ -39,12 +39,14 @@ function App()
 	
         logIn: async(userNumber,userName,userState)=> // this function will be called by userDetails component 
         {      
-            dispatch({type:'LOGIN',userNumber:userNumber,userName:userName,userState:userState});  // calling dispatcher action for login ... this action is in ./helpers/Reduceractions
+            dispatch({type:'LOGIN',userNumber:userNumber,userName:userName,userState:userState,userProfile:userProfile});  // calling dispatcher action for login ... this action is in ./helpers/Reduceractions
         
             var database = firebase.database();
             var userdetailed={};
             userdetailed['/users/'+userNumber+'/userName']=userName;
             userdetailed['/users/'+userNumber+'/userState']=userState;
+            userdetailed['/users/'+userNumber+'/userProfile']=userProfile;
+
             try
             {
                 await database.ref().update(userdetailed);  
@@ -52,10 +54,11 @@ function App()
                 await AsyncStorage.setItem('userNumber',userNumber);            //set all details in local storage of phone
                 await AsyncStorage.setItem('userName',userName);
                 await AsyncStorage.setItem('userState',userState);
+                await AsyncStorage.setItem('userProfile',userProfile);
             }
             catch(err)
             {
-                ToastAndroid.show("Some error occurred! Try again",ToastAndroid.LONG);
+                ToastAndroid.show("Some error occurred! Try again",ToastAndroid.SHORT);
             }
         },
 
@@ -66,12 +69,13 @@ function App()
                 await  AsyncStorage.removeItem('userNumber');
                 await  AsyncStorage.removeItem('userState');
                 await  AsyncStorage.removeItem('userName');
+                await  AsyncStorage.removeItem('userProfile');
 
                 dispatch({type:'LOGOUT'});           //calling dispatcher action for logging out ... this action is in ./helpers/Reduceractions 
             } 
             catch(e)
             {
-                ToastAndroid.show("Some error occurred! Try again",ToastAndroid.LONG);
+                ToastAndroid.show("Some error occurred! Try again",ToastAndroid.SHORT);
             }
         },
 
@@ -84,19 +88,20 @@ function App()
         let userNumber = null;      //these variales will store data from local storage  
         let userName = null;
         let userState = null;
-        
+        let userProfile = null;
         try
         {
           userNumber = await AsyncStorage.getItem('userNumber');      //getting phonenumber,name,profile,status from storage
           userName = await AsyncStorage.getItem('userName');
           userState = await AsyncStorage.getItem('userState');
+          userProfile = await AsyncStorage.getItem('userProfile');
         }
         catch(e)
         {
           console.log(e);       //showing error
         }
         
-        dispatch({type:'RETRIEVE_STORED_DATA',userNumber:userNumber,userName:userName,userState:userState});        //calling dispatcher action for setting the data retrived ... this action is in ./helpers/Reduceractions 
+        dispatch({type:'RETRIEVE_STORED_DATA',userNumber:userNumber,userName:userName,userState:userState,userProfile:userProfile});        //calling dispatcher action for setting the data retrived ... this action is in ./helpers/Reduceractions 
         setTimeout(()=>{
           SplashScreen.hide()
         },1000);
