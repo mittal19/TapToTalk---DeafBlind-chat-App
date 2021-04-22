@@ -37,16 +37,14 @@ function App()
     const authContext = React.useMemo(()=>      //creating authcontext .. the functions created here will be accessible all in the app
     ({        
 	
-        logIn: async(userNumber,userName,userState)=> // this function will be called by userDetails component 
+        logIn: async(userNumber,userName,userState,userProfile)=> // this function will be called by userDetails component 
         {      
             dispatch({type:'LOGIN',userNumber:userNumber,userName:userName,userState:userState,userProfile:userProfile});  // calling dispatcher action for login ... this action is in ./helpers/Reduceractions
-        
             var database = firebase.database();
             var userdetailed={};
             userdetailed['/users/'+userNumber+'/userName']=userName;
             userdetailed['/users/'+userNumber+'/userState']=userState;
             userdetailed['/users/'+userNumber+'/userProfile']=userProfile;
-
             try
             {
                 await database.ref().update(userdetailed);  
