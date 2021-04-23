@@ -7,7 +7,7 @@
 
  
 import React,{useEffect} from 'react';
-import {View,ToastAndroid,Text} from 'react-native';
+import {View,ToastAndroid,Text,ActivityIndicator} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -34,17 +34,21 @@ function App()
   
     const [loginState,dispatch] = React.useReducer(Reduceractions,initialLogin);   //intializing reducer , Reduceractions imported, initialLogin imported
 
+    const [activityIndicator,set_activityIndicator] = React.useState(false);
+
     const authContext = React.useMemo(()=>      //creating authcontext .. the functions created here will be accessible all in the app
     ({        
 	
         logIn: async(userNumber,userName,userState,userProfile)=> // this function will be called by userDetails component 
         {      
-            dispatch({type:'LOGIN',userNumber:userNumber,userName:userName,userState:userState,userProfile:userProfile});  // calling dispatcher action for login ... this action is in ./helpers/Reduceractions
+            set_activityIndicator(true);
+          
             var database = firebase.database();
             var userdetailed={};
             userdetailed['/users/'+userNumber+'/userName']=userName;
             userdetailed['/users/'+userNumber+'/userState']=userState;
             userdetailed['/users/'+userNumber+'/userProfile']=userProfile;
+
             try
             {
                 await database.ref().update(userdetailed);  
@@ -53,11 +57,15 @@ function App()
                 await AsyncStorage.setItem('userName',userName);
                 await AsyncStorage.setItem('userState',userState);
                 await AsyncStorage.setItem('userProfile',userProfile);
+
+                dispatch({type:'LOGIN',userNumber:userNumber,userName:userName,userState:userState,userProfile:userProfile});  // calling dispatcher action for login ... this action is in ./helpers/Reduceractions
             }
             catch(err)
             {
                 ToastAndroid.show("Some error occurred! Try again",ToastAndroid.SHORT);
             }
+
+            set_activityIndicator(false);
         },
 
         logOut: async()=>		//for signing user out 
@@ -108,6 +116,15 @@ function App()
     },[]);
 
   //if userNumber is null then show login process else show loggedin screens 
+
+  if(activityIndicator==true)
+  {
+    return(
+      <View style={{flex:1,justifyContent:'center',alignItems:'center',backgroundColor:'#3E4DC8'}}>
+        <ActivityIndicator size="large" color="#FFFFFF" />
+      </View>
+    );
+  }
 
   return(
     <AuthContext.Provider value={authContext}> 
