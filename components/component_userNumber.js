@@ -137,7 +137,7 @@ export function component_userNumber({navigation})
             <View></View>
             :
             <View style={styles.midView}>
-              <Image style={styles.logo} source={require('./res/TapToTalk_5.png')}/>    
+              <Image style={styles.logo} source={require('../res/img/TapToTalk_5.png')}/>    
               <Text style={styles.welcome}>Welcome</Text>
             </View>
           }

@@ -126,7 +126,7 @@ export function component_otp({route,navigation})
     <View style={styles.container}>
       
       <View style={styles.otpimageView}>
-        <Animated.Image source={require('./res/otp.png')} style={[styles.otpimageBig,{height:sizeAnimation,width:sizeAnimation}]}/>
+        <Animated.Image source={require('../res/img/otp.png')} style={[styles.otpimageBig,{height:sizeAnimation,width:sizeAnimation}]}/>
       </View>
 
       <View style={styles.midView}>
