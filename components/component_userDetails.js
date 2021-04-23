@@ -150,6 +150,13 @@ export function component_userDetails({route,navigation})
         }
     }
 
+    const function_removeSelected=async()=>
+    {
+        setModalVisible(!modalVisible);
+        set_userProfile('default');
+        set_userProfileName('defaultProfile.png');
+    }
+
     return(
         <View style={styles.container}>
         
@@ -163,22 +170,40 @@ export function component_userDetails({route,navigation})
                 }}>
 
                 <View style={styles.modalandpressable}>
+                   
                     <View style={styles.modalinside}>
-                        <Pressable
-                            style={styles.modalandpressable}
-                            onPress={() => function_openGallery()}>
-                            <Text style={styles.modaltext}>Choose from gallery</Text>
-                        </Pressable>
-                        <Pressable
-                            style={styles.modalandpressable}
-                            onPress={() => function_openCamera()}>
-                            <Text style={styles.modaltext}>Take from camera</Text>
-                        </Pressable>
-                        <Pressable
-                            style={styles.modalandpressable}
-                            onPress={() => setModalVisible(!modalVisible)}>
-                            <Text style={[styles.modaltext,{fontFamily:'Montserrat-SemiBold'}]}>Cancel</Text>
-                        </Pressable>
+                        
+                        <View style={{flex:2}}>
+                            <Pressable
+                                style={styles.modalandpressable}
+                                onPress={() => function_openGallery()}>
+                                <Text style={[styles.modaltext,{fontFamily:'Montserrat-SemiBold'}]}>Choose from gallery</Text>
+                            </Pressable>
+                            <Pressable
+                                style={styles.modalandpressable}
+                                onPress={() => function_openCamera()}>
+                                <Text style={[styles.modaltext,{fontFamily:'Montserrat-SemiBold'}]}>Take from camera</Text>
+                            </Pressable>
+                        </View>
+
+                        <View style={{flex:1,flexDirection:'row'}}>
+                            {
+                                userProfileName=='defaultProfile.png'?
+                                <View></View>
+                                :
+                                <Pressable
+                                    style={styles.modalandpressable}
+                                    onPress={() => function_removeSelected()}>
+                                    <Text style={styles.modaltext}>Remove</Text>
+                                </Pressable>
+                            }
+                            <Pressable
+                                style={styles.modalandpressable}
+                                onPress={() => setModalVisible(!modalVisible)}>
+                                <Text style={styles.modaltext}>Cancel</Text>
+                            </Pressable>
+                        </View>
+                        
                     </View>
                 </View>
             </Modal>
@@ -202,7 +227,7 @@ export function component_userDetails({route,navigation})
                         </View>
                         <View>
                             <Pressable onPress={()=>setModalVisible(true)} style={styles.profilePressable}>
-                                <Image borderRadius={50} source={{width:height/4.5,height:height/4.5,borderRadius:height/16,uri:userProfile}}/>    
+                                <Image borderRadius={50} source={{width:height/4,height:height/4,borderRadius:height/16,uri:userProfile}}/>    
                             </Pressable>     
                         </View>
                     </View>

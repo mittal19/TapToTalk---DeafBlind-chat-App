@@ -27,7 +27,7 @@ export default StyleSheet.create({
     upperView:{
         justifyContent:'center',
         alignItems:'center',
-        height:height/2.75
+        height:height/3
     },
     shapesWithOut:{
         height:height/4,
@@ -56,23 +56,23 @@ export default StyleSheet.create({
         alignItems:'center'
     },
     shapesWithoutOut:{
-        height:400,
-        width:400,
-        left:150,
-        top:-200,
+        height:height/1.75,
+        width:height/1.75,
+        left:width/3,
+        top:-height/3.5,
         backgroundColor:'#C72FF8FF',
         justifyContent:'center',
         alignItems:'center',
-        borderRadius:100,
+        borderRadius:height/7,
         position:'absolute',
         transform:[{rotate:'-45deg'}]
     },
     shapesWithoutIn:{
-        height:400,
-        width:400,
-        left:75,
+        height:height/1.75,
+        width:height/1.75,
+        left:width/5,
         backgroundColor:'#3AF9EFFF',
-        borderRadius:100,
+        borderRadius:height/7,
         justifyContent:'center',
         alignItems:'center',
         position:'absolute',
@@ -80,27 +80,28 @@ export default StyleSheet.create({
     },
     midView:{
         flex:1,
-        marginHorizontal:24,
-        marginVertical:8
+        marginHorizontal:width/18,
+        marginVertical:height/120
     },
     textView:{
-        marginVertical:18
+        marginVertical:height/40
     },
     userheading:{
-        color:'#ffffff',fontSize:width/26,
+        color:'#ffffff',
+        fontSize:width/26,
         fontFamily:'Montserrat-Regular'
     },
     textInput:{
         color:'#ffffff',
-        marginVertical:4,
+        marginVertical:height/150,
         fontSize:width/22,
         borderBottomWidth:1,
         borderColor:"#ffffff",
         letterSpacing:3,
         fontFamily:'Montserrat-Medium'
     },
-    imapairedView:{
-        marginVertical:18
+    impairedView:{
+        marginVertical:height/40
     },
     imapairedHead:{
         color:'#ffffff',
@@ -109,10 +110,11 @@ export default StyleSheet.create({
     },
     pickerView:{
         color:'#ffffff',
-        marginVertical:4
+        marginVertical:height/150
     },
     pickerItem:{
-        fontSize:width/24
+        fontSize:width/24,
+        
     },
     pickerLine:{
         backgroundColor:'#ffffff',
