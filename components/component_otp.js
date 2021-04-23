@@ -5,7 +5,7 @@
 //if otp is correct navigate to user details screen else show error and re try.
 
 import React,{useEffect,useState,useRef} from 'react';
-import {View,Text,TouchableOpacity,ToastAndroid,Image,Keyboard,Animated, Easing,KeyboardAvoidingView} from 'react-native';
+import {View, Text, TouchableOpacity, ToastAndroid, Keyboard, Animated, ActivityIndicator} from 'react-native';
 import OTPInputView from '@twotalltotems/react-native-otp-input';
 import styles,{width,height} from './styling/style_otp';
 import LinearGradient from 'react-native-linear-gradient';
@@ -50,6 +50,7 @@ export function component_otp({route,navigation})
 
   const {userNumber,requestId} = route.params;       // getting info from previous screen
   const [otp,set_otp] = React.useState('');         //this will store the user entered otp 
+  const [verifying,set_verifying] = React.useState(false);
 
   const function_otpNotRecieved=()=>        //this function gets executed when user press otp not recieved 
   {         
@@ -63,6 +64,8 @@ export function component_otp({route,navigation})
     {
       try
       {
+        set_verifying(true);
+
         /*const returnedData = await fetch('http://192.168.43.13:3000/verify',{   //this whole fetch will verfiy otp and other data recieved from otp component
                                 method:'POST',
                                 headers:{
@@ -101,11 +104,22 @@ export function component_otp({route,navigation})
         ToastAndroid.show("Some error occurred! Try again,",ToastAndroid.SHORT);
         navigation.goBack();  //error occurred . go back n try again
       }
+
+      set_verifying(false);
     }
     else
     {
       ToastAndroid.show('Enter all 4 digits',ToastAndroid.SHORT); //showing toast to enter proper otp.
     }
+  }
+
+  if(verifying==true)
+  {
+    return(
+      <View style={{flex:1,justifyContent:'center',alignItems:'center',backgroundColor:'#ffffff'}}>
+        <ActivityIndicator size="large" color="#3E4DC8"/>
+      </View>
+    );
   }
 
   return(
