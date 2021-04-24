@@ -34,14 +34,14 @@ function App()
   
     const [loginState,dispatch] = React.useReducer(Reduceractions,initialLogin);   //intializing reducer , Reduceractions imported, initialLogin imported
 
-    const [activityIndicator,set_activityIndicator] = React.useState(false);
+    const [activityIndicator,set_activityIndicator] = React.useState(false);   // this usestate will decide whether to show activity indicator or not.
 
     const authContext = React.useMemo(()=>      //creating authcontext .. the functions created here will be accessible all in the app
     ({        
 	
         logIn: async(userNumber,userName,userState,userProfile)=> // this function will be called by userDetails component 
         {      
-            set_activityIndicator(true);
+            set_activityIndicator(true);  
           
             var database = firebase.database();
             var userdetailed={};
