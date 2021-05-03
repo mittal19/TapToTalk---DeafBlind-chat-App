@@ -51,7 +51,7 @@ export function component_home({navigation})
   }
 
   return(
-    <View>
+    <View style={{flex:1,justifyContent:'space-between'}}>
       <Text>HOME</Text>
       <TouchableOpacity onPress={checkcontacts} ><Text>CONTACTS</Text></TouchableOpacity>
       <TouchableOpacity onPress={logOut}><Text>Logout</Text></TouchableOpacity>
