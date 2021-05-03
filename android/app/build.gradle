@@ -194,6 +194,8 @@ dependencies {
     
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
     
+    implementation project(':react-native-contacts')
+    
     implementation platform('com.google.firebase:firebase-bom:27.0.0')
 
     implementation 'com.google.firebase:firebase-analytics'
