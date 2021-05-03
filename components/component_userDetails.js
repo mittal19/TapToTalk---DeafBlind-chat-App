@@ -2,8 +2,7 @@
 //Then logIn Memo function created in App.js is called with the details passed.
 
 import React,{useEffect} from 'react';
-import {View,Text,TextInput,TouchableOpacity,ToastAndroid,Modal,Pressable,Image,Keyboard} from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {View,Text,TextInput,TouchableOpacity,ToastAndroid,Modal,Pressable,Image,Keyboard,ActivityIndicator} from 'react-native';
 import {AuthContext} from '../helpers/context';
 import styles,{width,height} from './styling/style_userDetails';
 import ImagePicker from 'react-native-image-crop-picker';
@@ -22,7 +21,8 @@ export function component_userDetails({route,navigation})
     const [userProfile,set_userProfile] = React.useState('default');
     const [userProfileName,set_userProfileName] = React.useState('defaultProfile.png');
     const [selectedOption, set_selectedOption] =   React.useState();
-    const [modalVisible, setModalVisible] = React.useState(false);
+    const [modalVisible, set_modalVisible] = React.useState(false);
+    const [activityIndicator,set_activityIndicator] = React.useState(false);
 
     useEffect(() => 
     {
@@ -45,6 +45,7 @@ export function component_userDetails({route,navigation})
 
     const function_submitDetails =async()=>             //this function will be called when user clicks submit details button
     { 
+        set_activityIndicator(true);
         try
         {
             if(userName.length<1||userState.length<1)        //checking if all details are entered
@@ -62,12 +63,8 @@ export function component_userDetails({route,navigation})
                         console.log(resp);
                         if(resp["state"]=="success")
                         { 
-                            await AsyncStorage.setItem('userNumber',userNumber);            //set all details in local storage of phone
-                            await AsyncStorage.setItem('userName',userName);
-                            await AsyncStorage.setItem('userState',userState);
-                            await AsyncStorage.setItem('userProfile',userProfile);
-                            logIn(userNumber,userName,userState,userProfile);           //call function created in App.js using memo
-                        }
+                            logIn(userNumber,userName,userState,userProfileName);           //call function created in App.js using memo
+                        } 
                         else
                         {   
                             ToastAndroid.show("Some error occured.Try again!",ToastAndroid.SHORT);
@@ -75,11 +72,7 @@ export function component_userDetails({route,navigation})
                     }
                     else
                     {
-                        await AsyncStorage.setItem('userNumber',userNumber);            //set all details in local storage of phone
-                        await AsyncStorage.setItem('userName',userName);
-                        await AsyncStorage.setItem('userState',userState);
-                        await AsyncStorage.setItem('userProfile',userProfile);
-                        logIn(userNumber,userName,userState,userProfile);           //call function created in App.js using memo
+                        logIn(userNumber,userName,userState,userProfileName);           //call function created in App.js using memo
                     }
                     
                 }
@@ -96,13 +89,14 @@ export function component_userDetails({route,navigation})
             ToastAndroid.show("Some error occurred! Try again",ToastAndroid.SHORT);
             navigation.pop();
         }
+        set_activityIndicator(false);
     }
 
     const function_openGallery=async()=>
     {
         try
         {
-            setModalVisible(!modalVisible);
+            set_modalVisible(!modalVisible);
             await ImagePicker.openPicker({
                 width:500,
                 height:500,
@@ -129,7 +123,7 @@ export function component_userDetails({route,navigation})
     {
         try
         {
-            setModalVisible(!modalVisible);
+            set_modalVisible(!modalVisible);
             await ImagePicker.openCamera({
                 widht:500,
                 height:500,
@@ -152,9 +146,18 @@ export function component_userDetails({route,navigation})
 
     const function_removeSelected=async()=>
     {
-        setModalVisible(!modalVisible);
+        set_modalVisible(!modalVisible);
         set_userProfile('default');
         set_userProfileName('defaultProfile.png');
+    }
+
+    if(activityIndicator==true)
+    {
+        return(
+        <View style={{flex:1,justifyContent:'center',alignItems:'center',backgroundColor:'#3E4DC8'}}>
+            <ActivityIndicator size="large" color="#FFFFFF" />
+        </View>
+        );
     }
 
     return(
@@ -166,7 +169,7 @@ export function component_userDetails({route,navigation})
                 visible={modalVisible}
                 onRequestClose={() => 
                 {
-                    setModalVisible(!modalVisible);
+                    set_modalVisible(!modalVisible);
                 }}>
 
                 <View style={styles.modalandpressable}>
@@ -199,7 +202,7 @@ export function component_userDetails({route,navigation})
                             }
                             <Pressable
                                 style={styles.modalandpressable}
-                                onPress={() => setModalVisible(!modalVisible)}>
+                                onPress={() => set_modalVisible(!modalVisible)}>
                                 <Text style={styles.modaltext}>Cancel</Text>
                             </Pressable>
                         </View>
@@ -213,7 +216,7 @@ export function component_userDetails({route,navigation})
                     <View style={styles.upperView}>
                         <View style={styles.shapesWithOut}>
                             <View style={styles.shapesWithIn}>
-                                <Pressable onPress={()=>setModalVisible(true)} style={[styles.profilePressable,{transform:[{rotate:'30deg'}]}]}>
+                                <Pressable onPress={()=>set_modalVisible(true)} style={[styles.profilePressable,{transform:[{rotate:'30deg'}]}]}>
                                     <Icon name="camera-outline" size={width/10} color='#3E4DC8'/>    
                                 </Pressable>
                             </View>
@@ -226,7 +229,7 @@ export function component_userDetails({route,navigation})
                             </View>
                         </View>
                         <View>
-                            <Pressable onPress={()=>setModalVisible(true)} style={styles.profilePressable}>
+                            <Pressable onPress={()=>set_modalVisible(true)} style={styles.profilePressable}>
                                 <Image borderRadius={50} source={{width:height/4,height:height/4,borderRadius:height/16,uri:userProfile}}/>    
                             </Pressable>     
                         </View>
