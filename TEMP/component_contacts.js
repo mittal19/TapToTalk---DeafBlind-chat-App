@@ -4,7 +4,7 @@
 //THEN USER CAN CLICK ON A CONTACT TO NAVIGATE TO PERSONAL MESSAGE SCREEN OF SELECTED CONTACT
 
 import React,{useEffect,useState} from 'react';
-import {View,Text,TouchableOpacity,FlatList,Platform,PermissionsAndroid,ActivityIndicator,Modal,SafeAreaView,ToastAndroid,Dimensions,ScrollView} from 'react-native';
+import {View,Text,TouchableOpacity,FlatList,Platform,PermissionsAndroid,ActivityIndicator, ToastAndroid,Dimensions,ScrollView} from 'react-native';
 import Contacts from 'react-native-contacts';
 import {firebase} from '../helpers/firebaseConfig';
 import storage from '@react-native-firebase/storage';
@@ -21,10 +21,6 @@ export function component_contacts({route,navigation})
   const [isLoading,set_isLoading] = useState(true);
   const [onTapToTalk,set_onTapToTalk] = useState([]);   //hold contacts on taptotalk
   const [notTapToTalk,set_notTapToTalk] = useState([]);   //hold contacts not on taptotalk
-  const [modalVisible, set_modalVisible] = useState(false);
-  const [openImg,set_openImg] = useState();
-  const [imgWidth,set_imgWidth] = useState(400);
-  const [imgHeight,set_imgHeight] = useState(400);
 
   useEffect(()=>
   {
@@ -156,20 +152,6 @@ export function component_contacts({route,navigation})
     ToastAndroid.show(receiver.userName +" is not on TapToTalk! Invite them here.",ToastAndroid.SHORT);
   }
 
-  const function_openImg = (userProfile)=>
-  {
-    if(userProfile!='https://firebasestorage.googleapis.com/v0/b/taptotalk-ce0f0.appspot.com/o/defaultProfile.png?alt=media&token=7c559b92-a6a2-4ba7-ace9-9cbb3a8d6d2c')
-    {
-      Image.getSize(userProfile, (width, height) => 
-        {
-          set_imgHeight(height);
-          set_imgWidth(width);
-        });
-      set_openImg(userProfile);
-      set_modalVisible(!modalVisible);
-    }
-  }
-
   if(isLoading==true)
   {  //showin loader  till contacts is not fetched
     return(
@@ -182,51 +164,58 @@ export function component_contacts({route,navigation})
   return( 
     <ScrollView style={{backgroundColor:'#3E4DC8'}}>
 
-      <Modal
-          animationType="fade"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => 
-          {
-              set_modalVisible(!modalVisible);
-          }}>
+      <View style={{marginHorizontal:16,marginTop:8}}>
 
-          <SafeAreaView style={{flex:1,justifyContent:'center',alignItems:'center'}}>
-              <Image
-                  source={{uri:openImg}}
-                  style={{width:imgWidth,height:imgHeight}}
-                  PlaceholderContent={<Text style={{fontSize:8}}>Image</Text>}
-                />
-          </SafeAreaView>
-      </Modal>
-
-      <SafeAreaView style={{marginHorizontal:16}}>
-
-        <Text style={{color:'#DCDCDC',fontSize:18,fontFamily:'Montserrat-Regular',marginTop:16}}>Contacts</Text>
+        <Text style={{color:'#DCDCDC',fontSize:16,fontFamily:'Montserrat-Regular'}}>Contacts</Text>
 
         <FlatList    //this list will show users who are on taptotalk
           style={{ marginVertical:16}}
           data={onTapToTalk}
           keyExtractor={({ id }, index) => id.toString()}
           renderItem={({ item }) => (
-            <SafeAreaView style={{flexDirection:'row',marginVertical:6,flex:1,alignItems:'center'}}>
-
-              <TouchableOpacity onPress={()=>function_openImg(item.userProfile)} style={{backgroundColor:'#ffffff',width:44,height:44,borderRadius:44}}>
-                <Image
-                  source={{ uri: item.userProfile }}
-                  style={{width:44,height:44,borderRadius:44}}
-                  PlaceholderContent={<Text style={{fontSize:8}}>Image</Text>}
-                />
-              </TouchableOpacity>
+            <View style={{flexDirection:'row',marginVertical:20}}>
               
-              <TouchableOpacity onPress={()=>openpersonalmessage(item)} style={{flex:1,justifyContent:'center',marginLeft:16,backgroundColor:'#ffffff',height:48,flex:1,borderRadius:8}}>
-                <Text style={{marginLeft:12,fontSize:18,color:'#3E4DC8',fontFamily:'Montserrat-Medium'}}>{item.userName}</Text>
+              <Image
+                source={{ uri: item.userProfile }}
+                style={{width:40,height:40,borderRadius:16}}
+                PlaceholderContent={<Text style={{fontSize:8}}>Image</Text>}
+              />
+
+              <TouchableOpacity onPress={()=>openpersonalmessage(item)}>
+                <View style={{flex:1,justifyContent:'center',marginLeft:16}}>
+                  <Text style={{fontSize:18,color:'#ffffff',fontFamily:'Montserrat-Medium'}}>{item.userName}</Text>
+                </View>
               </TouchableOpacity>
 
-            </SafeAreaView>    
+            </View>    
           )} 
         />
-      </SafeAreaView>
+      </View>
+
+
+      <View style={{backgroundColor:'#ffffff',borderRadius:48}}>
+
+        <Text style={{justifyContent:'center',alignItems:'center'}}>Invite</Text>
+        
+        <FlatList    //this list will show users who are not on taptotalk
+          style={{ margin:10 }}
+          data={notTapToTalk}
+          keyExtractor={({ id }, index) => id.toString()}
+          renderItem={({ item }) => (
+            <View style={{flexDirection:'row'}}>
+
+              <TouchableOpacity onPress={()=>invitethem(item)}>
+                <View style={{flex:1,flexDirection:'row',justifyContent:'space-between',padding:6}}>
+                  <Text>{item.userName}</Text>
+                </View>
+              </TouchableOpacity>
+
+              <Icon name="arrowright" size={18} color="#000000"/>
+
+            </View>    
+          )} 
+        />
+      </View>
 
     </ScrollView>
   );
