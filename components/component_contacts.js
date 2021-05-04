@@ -23,8 +23,6 @@ export function component_contacts({route,navigation})
   const [notTapToTalk,set_notTapToTalk] = useState([]);   //hold contacts not on taptotalk
   const [modalVisible, set_modalVisible] = useState(false);
   const [openImg,set_openImg] = useState();
-  const [imgWidth,set_imgWidth] = useState(400);
-  const [imgHeight,set_imgHeight] = useState(400);
 
   useEffect(()=>
   {
@@ -160,11 +158,6 @@ export function component_contacts({route,navigation})
   {
     if(userProfile!='https://firebasestorage.googleapis.com/v0/b/taptotalk-ce0f0.appspot.com/o/defaultProfile.png?alt=media&token=7c559b92-a6a2-4ba7-ace9-9cbb3a8d6d2c')
     {
-      Image.getSize(userProfile, (width, height) => 
-        {
-          set_imgHeight(height);
-          set_imgWidth(width);
-        });
       set_openImg(userProfile);
       set_modalVisible(!modalVisible);
     }
@@ -191,11 +184,11 @@ export function component_contacts({route,navigation})
               set_modalVisible(!modalVisible);
           }}>
 
-          <SafeAreaView style={{flex:1,justifyContent:'center',alignItems:'center'}}>
+          <SafeAreaView style={{flex:1,justifyContent:'center',alignItems:'center',height:height,width:width,backgroundColor:'#000000'}}>
               <Image
                   source={{uri:openImg}}
-                  style={{width:imgWidth,height:imgHeight}}
-                  PlaceholderContent={<Text style={{fontSize:8}}>Image</Text>}
+                  style={{width:width,height:width}}
+                  PlaceholderContent={<Text style={{fontSize:24}}>Image</Text>}
                 />
           </SafeAreaView>
       </Modal>
