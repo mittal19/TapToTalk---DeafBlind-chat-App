@@ -122,6 +122,25 @@ export function component_message({route,navigation})
               {
                 console.log("Done");     //after sending print 'then' in console
               });
+    
+    await firestore()
+            .collection(details['sender'].userNumber)
+            .doc(details['receiver'].userNumber)
+            .set({
+              latestmesg:message
+            }).then(()=>
+            {
+              console.log("Done");     //after sending print 'then' in console
+            });
+    await firestore()
+            .collection(details['receiver'].userNumber)
+            .doc(details['sender'].userNumber)
+            .set({
+              latestmesg:message
+            }).then(()=>
+            {
+              console.log("Done");     //after sending print 'then' in console
+            });
   }
 
   return (
