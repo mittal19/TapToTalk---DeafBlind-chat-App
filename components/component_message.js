@@ -15,6 +15,7 @@ import firestore from '@react-native-firebase/firestore';
 export function component_message({route,navigation})
 {
   const details = route.params;           //get usernumber and clicked number form previous screen
+  
   const [messages,setMessages] = useState([]);    //messages will be stored in this
   const [aa,seta] = useState();         //smaller number will be stored here
   const [bb,setb] = useState();      //greater number will be stored here
@@ -22,17 +23,16 @@ export function component_message({route,navigation})
   
   useEffect(()=>          //will do some tast after rendering screen 
   {
-    
-    if(details['sender'].userNumber<details['receiver'].userNumber)
+    if(details['sender']<details['receiver'].userNumber)
     {           //checking which number is smaller
-      a=details['sender'].userNumber;
+      a=details['sender'];
       b=details['receiver'].userNumber;          //setting them in variable acccordingly
       seta(a);            //setting them in usestate
       setb(b);
     }
     else
     {                                  
-      b=details['sender'].userNumber;
+      b=details['sender'];
       a=details['receiver'].userNumber;
       seta(a);  //setting them accordinglt smaller and larger number
       setb(b);
@@ -124,20 +124,16 @@ export function component_message({route,navigation})
               });
     
     await firestore()
-            .collection(details['sender'].userNumber)
+            .collection(details['sender'])
             .doc(details['receiver'].userNumber)
-            .set({
-              latestmesg:message
-            }).then(()=>
+            .set({message}).then(()=>
             {
               console.log("Done");     //after sending print 'then' in console
             });
     await firestore()
             .collection(details['receiver'].userNumber)
-            .doc(details['sender'].userNumber)
-            .set({
-              latestmesg:message
-            }).then(()=>
+            .doc(details['sender'])
+            .set({message}).then(()=>
             {
               console.log("Done");     //after sending print 'then' in console
             });
@@ -148,7 +144,7 @@ export function component_message({route,navigation})
       messages={messages}    //messages usestate declared above
       onSend={message => sendtofirebase(message)}         //when clicked send button
       user={{
-        _id:details['sender'].userNumber,    //my usernumber will be here...usernumber whose number is loggen in now...
+        _id:details['sender'],    //my usernumber will be here...usernumber whose number is loggen in now...
       }}
     />
   )
