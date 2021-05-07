@@ -105,9 +105,12 @@ export function component_message({route,navigation})
 
   const sendtofirebase=async(message)=>          //when user type and click send button this function is called
   {
+    console.log(message);
+    console.log(typeof message);
+    console.log(message[0]);
+    console.log(typeof message[0]);
     var timestamp = new Date().getTime();   ///get current time 
-    console.log("aa "+aa);
-    console.log("bb "+bb);
+    
     await firestore()
             .collection('Messages')
             .doc(aa)
@@ -126,14 +129,14 @@ export function component_message({route,navigation})
     await firestore()
             .collection(details['sender'])
             .doc(details['receiver'].userNumber)
-            .set({message}).then(()=>
+            .set(message[0]).then(()=>
             {
               console.log("Done");     //after sending print 'then' in console
             });
     await firestore()
             .collection(details['receiver'].userNumber)
             .doc(details['sender'])
-            .set({message}).then(()=>
+            .set(message[0]).then(()=>
             {
               console.log("Done");     //after sending print 'then' in console
             });
