@@ -11,12 +11,15 @@ import storage from '@react-native-firebase/storage';
 import Icon from 'react-native-vector-icons/AntDesign';  
 import {Image} from 'react-native-elements';
 
+GLOBAL = require('../global');
+
 const {width, height} = Dimensions.get('window');
 
-export function component_contacts({route,navigation})
+export function component_contacts({navigation})
 {
 
-  const sender = route.params;   //getting userNumber from previous screen
+  const sender = GLOBAL.userNumber;
+  
   const dbref = firebase.database().ref();     //setting reference to real time database
   const [isLoading,set_isLoading] = useState(true);
   const [onTapToTalk,set_onTapToTalk] = useState([]);   //hold contacts on taptotalk
@@ -167,7 +170,7 @@ export function component_contacts({route,navigation})
   {  //showin loader  till contacts is not fetched
     return(
       <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
-        <ActivityIndicator size="large" color="#000000"/>
+        <ActivityIndicator size="large" color="#3E4DC8"/>
       </View>
     );
   }

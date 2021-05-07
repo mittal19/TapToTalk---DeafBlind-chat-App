@@ -29,6 +29,8 @@ import {component_saveProfile} from './components/component_saveProfile';
 
 const Stack = createStackNavigator();    //for creating navigation between screens possible using stack navigator
 
+GLOBAL = require('./global');
+
 function App()
 {
   
@@ -38,7 +40,7 @@ function App()
 
     const authContext = React.useMemo(()=>      //creating authcontext .. the functions created here will be accessible all in the app
     ({        
-	
+ 
         logIn: async(userNumber,userName,userState,userProfile)=> // this function will be called by userDetails component 
         {      
             set_activityIndicator(true);  
@@ -58,6 +60,8 @@ function App()
                 await AsyncStorage.setItem('userState',userState);
                 await AsyncStorage.setItem('userProfile',userProfile);
 
+                GLOBAL.userNumber=userNumber;
+
                 dispatch({type:'LOGIN',userNumber:userNumber,userName:userName,userState:userState,userProfile:userProfile});  // calling dispatcher action for login ... this action is in ./helpers/Reduceractions
             }
             catch(err)
@@ -76,6 +80,8 @@ function App()
                 await  AsyncStorage.removeItem('userState');
                 await  AsyncStorage.removeItem('userName');
                 await  AsyncStorage.removeItem('userProfile');
+
+                GLOBAL.userNumber='';
 
                 dispatch({type:'LOGOUT'});           //calling dispatcher action for logging out ... this action is in ./helpers/Reduceractions 
             } 
@@ -108,6 +114,9 @@ function App()
         }
         
         dispatch({type:'RETRIEVE_STORED_DATA',userNumber:userNumber,userName:userName,userState:userState,userProfile:userProfile});        //calling dispatcher action for setting the data retrived ... this action is in ./helpers/Reduceractions 
+        
+        GLOBAL.userNumber = userNumber;
+        
         setTimeout(()=>{
           SplashScreen.hide()
         },1000);
@@ -140,7 +149,7 @@ function App()
         :
         <Stack.Navigator> 
               
-          <Stack.Screen name="Home" component={component_home} options={{headerShown: false}}/>
+          <Stack.Screen name="Home" component={component_home} options={{headerShown: false}} initialParams={{'key':'value'}}/>
           <Stack.Screen name="Contacts" component={component_contacts} options={{headerShown: false}}/>
           <Stack.Screen name="Message" component={component_message} options={{headerShown: false}}/>
         </Stack.Navigator>
