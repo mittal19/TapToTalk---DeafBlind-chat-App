@@ -1,10 +1,12 @@
-//This App.js file will have stack navigator for navigating between screens
-// First of all when user open app - isLoading var is true so splash screen will show up
-// BY that time useeffect function have settime out function whichh will load data from local storage
-// and set it using dispatcher actions after 1000ms.
-// if userNumber retrieved from local storage is null then enter phone number component will open 
-//else if usernumber is not null then home component will open.
-
+/*When user click on app MainActivity.java will open splash screen.
+Then useEffect will check if phone storage has usernumber,username..like data.
+Then retrived data will be stored in loginstate using reterive function.
+Global username is set to whatever retreived
+After 800ms splashscreen hide function is called.800ms can be reduced or increased.
+If usernumber retrived was not null then show home screen
+Else show login screen.
+Stack navigator for navigating between screens
+*/
  
 import React,{useEffect} from 'react';
 import {View,ToastAndroid,Text,ActivityIndicator} from 'react-native';
@@ -24,16 +26,17 @@ import {component_otp} from './components/component_otp';
 import {component_contacts} from './components/component_contacts';
 import {component_message} from './components/component_message';
 import {component_userDetails} from './components/component_userDetails';
-import {component_selectProfile} from './components/component_selectProfile';
-import {component_saveProfile} from './components/component_saveProfile';
 
 const Stack = createStackNavigator();    //for creating navigation between screens possible using stack navigator
 
-GLOBAL = require('./global');
+GLOBAL = require('./global');  //make access of global usernumber here
 
 function App()
 {
-  
+ 
+    console.log("-----");
+    console.log("App.js - LOGS");
+
     const [loginState,dispatch] = React.useReducer(Reduceractions,initialLogin);   //intializing reducer , Reduceractions imported, initialLogin imported
 
     const [activityIndicator,set_activityIndicator] = React.useState(false);   // this usestate will decide whether to show activity indicator or not.
@@ -43,117 +46,178 @@ function App()
  
         logIn: async(userNumber,userName,userState,userProfile)=> // this function will be called by userDetails component 
         {      
-            set_activityIndicator(true);  
-          
-            var database = firebase.database();
-            var userdetailed={};
-            userdetailed['/users/'+userNumber+'/userName']=userName;
-            userdetailed['/users/'+userNumber+'/userState']=userState;
-            userdetailed['/users/'+userNumber+'/userProfile']=userProfile;
+            console.log("App.js - login function called");
+
+            set_activityIndicator(true);    //show activity indicator while saving details to firebase.
+
+            console.log("App.js - activity indicator showed");
 
             try
             {
-                await database.ref().update(userdetailed);  
+                console.log("App.js - creating userdetail object");
+
+                var userdetailed={}; //empty object
+                userdetailed['/users/'+userNumber+'/userName']=userName;
+                userdetailed['/users/'+userNumber+'/userState']=userState;
+                userdetailed['/users/'+userNumber+'/userProfile']=userProfile;   //setting userdetails to object. user details are stored in realtime database of firebase  
+               
+                console.log(userdetailed);
                 
+                console.log("App.js - creating reference to real time storage");
+
+                var database = firebase.database();   
+
+                console.log("App.js - storing userdetails to storage");
+                
+                await database.ref().update(userdetailed);   //details stored  
+                
+                console.log("App.js - storing userdetails to local storage");
+
                 await AsyncStorage.setItem('userNumber',userNumber);            //set all details in local storage of phone
                 await AsyncStorage.setItem('userName',userName);
                 await AsyncStorage.setItem('userState',userState);
                 await AsyncStorage.setItem('userProfile',userProfile);
 
-                GLOBAL.userNumber=userNumber;
+                console.log("App.js - setting global variable to usernumber");
 
-                dispatch({type:'LOGIN',userNumber:userNumber,userName:userName,userState:userState,userProfile:userProfile});  // calling dispatcher action for login ... this action is in ./helpers/Reduceractions
+                GLOBAL.userNumber=userNumber;      //setting global variable
+
+                console.log("App.js - calling login dispatch function");
+
+                dispatch({type:'LOGIN',userNumber:userNumber,userName:userName,userState:userState,userProfile:userProfile});  // calling dispatcher action for login ... this action is in ./helpers/Reduceractions  
             }
-            catch(err)
-            {
-                ToastAndroid.show("Some error occurred! Try again",ToastAndroid.SHORT);
-            }
-
-            set_activityIndicator(false);
-        },
-
-        logOut: async()=>		//for signing user out 
-        {   
-            try				//removing usernumber,status.. from local storage
-            { 
-                await  AsyncStorage.removeItem('userNumber');
-                await  AsyncStorage.removeItem('userState');
-                await  AsyncStorage.removeItem('userName');
-                await  AsyncStorage.removeItem('userProfile');
-
-                GLOBAL.userNumber='';
-
-                dispatch({type:'LOGOUT'});           //calling dispatcher action for logging out ... this action is in ./helpers/Reduceractions 
-            } 
             catch(e)
             {
                 ToastAndroid.show("Some error occurred! Try again",ToastAndroid.SHORT);
+                console.log("App.js - some error occured while logging userin");
+                console.log(e);
             }
+
+            set_activityIndicator(false);
+
+            console.log("App.js - activity indicator hide");
+        },
+
+        logOut: async()=>		//for signing user out 
+        {
+          console.log("App.js - logout function called");   
+          
+          set_activityIndicator(true);
+
+          console.log("App.js - activity indicator showed");
+
+          try				
+          { 
+              console.log("App.js - deleting userdetails from phone storage");
+
+              await  AsyncStorage.removeItem('userNumber');   //removing usernumber,userprofile,etc from local storage
+              await  AsyncStorage.removeItem('userState');
+              await  AsyncStorage.removeItem('userName');
+              await  AsyncStorage.removeItem('userProfile');
+
+              console.log("App.js - setting global variable to null");
+
+              GLOBAL.userNumber='';    //setting global variable to null
+
+              console.log("App.js - calling logout dispatch function");
+
+              dispatch({type:'LOGOUT'});           //calling dispatcher action for logging out ... this action is in ./helpers/Reduceractions 
+          } 
+          catch(e)
+          {
+              ToastAndroid.show("Some error occurred! Try again",ToastAndroid.SHORT);
+
+              console.log("App.js - Some error ocurred while logging user out");
+              console.log(e);
+          }
+
+          console.log("App.js - activity indicator hiding");
+
+          set_activityIndicator(false);
         },
 
     }),[]);
 
-    useEffect(()=>  //this will be automattically called is similar to component did mount
+    useEffect(async()=>  //this will be automattically called is similar to component did mount
     {            
-      setTimeout(async()=>
+      let userNumber = null;      //these variales will store data from local storage  
+      let userName = null;
+      let userState = null;
+      let userProfile = null;
+
+      try
       {
-        let userNumber = null;      //these variales will store data from local storage  
-        let userName = null;
-        let userState = null;
-        let userProfile = null;
-        try
-        {
-          userNumber = await AsyncStorage.getItem('userNumber');      //getting phonenumber,name,profile,status from storage
-          userName = await AsyncStorage.getItem('userName');
-          userState = await AsyncStorage.getItem('userState');
-          userProfile = await AsyncStorage.getItem('userProfile');
-        }
-        catch(e)
-        {
-          console.log(e);       //showing error
-        }
+        console.log("App.js - Getting userdetails from phone storage");
+
+        userNumber = await AsyncStorage.getItem('userNumber');      //getting phonenumber,name,profile,status from storage
+        userName = await AsyncStorage.getItem('userName');
+        userState = await AsyncStorage.getItem('userState');
+        userProfile = await AsyncStorage.getItem('userProfile');
+      }
+      catch(e)
+      {
+        ToastAndroid.show("Some error occurred while getting login information.",ToastAndroid.SHORT);
         
-        dispatch({type:'RETRIEVE_STORED_DATA',userNumber:userNumber,userName:userName,userState:userState,userProfile:userProfile});        //calling dispatcher action for setting the data retrived ... this action is in ./helpers/Reduceractions 
-        
-        GLOBAL.userNumber = userNumber;
-        
-        setTimeout(()=>{
-          SplashScreen.hide()
-        },1000);
-      },0);    //settime out of 1000ms is just for showing splash screen
-  
+        console.log("App.js - Error occured while Getting userdetails from phone storage");
+        console.log(e);
+      }
+      
+      console.log("App.js - got these details from phone storage");
+      console.log(userNumber);
+      console.log(userName);
+      console.log(userState);
+      console.log(userProfile);
+
+      console.log("App.js - calling dispatch retieve function");
+
+      dispatch({type:'RETRIEVE_STORED_DATA',userNumber:userNumber,userName:userName,userState:userState,userProfile:userProfile});        //calling dispatcher action for setting the data retrived ... this action is in ./helpers/Reduceractions 
+      
+      console.log("App.js - setting global variable");
+
+      GLOBAL.userNumber = userNumber;
+      
+      setTimeout(()=>
+      {
+        console.log("App.js - hiding slpash screen");
+
+        SplashScreen.hide();
+      },800);
+
     },[]);
 
-  //if userNumber is null then show login process else show loggedin screens 
-
+  
   if(activityIndicator==true)
   {
+    console.log("App.js - showing activity indicator");
+    
     return(
       <View style={{flex:1,justifyContent:'center',alignItems:'center',backgroundColor:'#3E4DC8'}}>
         <ActivityIndicator size="large" color="#FFFFFF" />
       </View>
     );
+
   }
 
   return(
     <AuthContext.Provider value={authContext}> 
       <NavigationContainer>
+      
       {loginState.userNumber == null ?  
+        
         <Stack.Navigator>
           <Stack.Screen name="Phone Number" component={component_userNumber} options={{headerShown: false}} />
           <Stack.Screen name="OTP" component={component_otp} options={{headerShown: false}}/>
           <Stack.Screen name="EnterDetails" component={component_userDetails} options={{headerShown: false}}/>
-          <Stack.Screen name="Select image" component={component_selectProfile} options={{headerShown: false}}/>
-          <Stack.Screen name="Save Profile" component={component_saveProfile} options={{headerShown: false}}/>
         </Stack.Navigator>
         :
-        <Stack.Navigator> 
-              
+        <Stack.Navigator>         
           <Stack.Screen name="Home" component={component_home} options={{headerShown: false}} initialParams={{'key':'value'}}/>
           <Stack.Screen name="Contacts" component={component_contacts} options={{headerShown: false}}/>
           <Stack.Screen name="Message" component={component_message} options={{headerShown: false}}/>
         </Stack.Navigator>
+      
       }
+
       </NavigationContainer>
     </AuthContext.Provider>
   );
