@@ -31,11 +31,13 @@ const Stack = createStackNavigator();    //for creating navigation between scree
 
 GLOBAL = require('./global');  //make access of global usernumber here
 
+const debug = true;   //set to false if you dont want logs
+
 function App()
 {
  
-    console.log("-----");
-    console.log("App.js - LOGS");
+    debug && console.log("-----");
+    debug && console.log("App.js - LOGS");
 
     const [loginState,dispatch] = React.useReducer(Reduceractions,initialLogin);   //intializing reducer , Reduceractions imported, initialLogin imported
 
@@ -46,92 +48,93 @@ function App()
  
         logIn: async(userNumber,userName,userState,userProfile)=> // this function will be called by userDetails component 
         {      
-            console.log("App.js - login function called");
+          debug && console.log("App.js - login function called");
 
-            set_activityIndicator(true);    //show activity indicator while saving details to firebase.
+          set_activityIndicator(true);    //show activity indicator while saving details to firebase.
 
-            console.log("App.js - activity indicator showed");
+          debug && console.log("App.js - activity indicator showed");
 
-            try
-            {
-                console.log("App.js - creating userdetail object");
+          try
+          {
+            debug && console.log("App.js - creating userdetail object");
 
-                var userdetailed={}; //empty object
-                userdetailed['/users/'+userNumber+'/userName']=userName;
-                userdetailed['/users/'+userNumber+'/userState']=userState;
-                userdetailed['/users/'+userNumber+'/userProfile']=userProfile;   //setting userdetails to object. user details are stored in realtime database of firebase  
-               
-                console.log(userdetailed);
-                
-                console.log("App.js - creating reference to real time storage");
+            var userdetailed={}; //empty object
+            userdetailed['/users/'+userNumber+'/userName']=userName;
+            userdetailed['/users/'+userNumber+'/userState']=userState;
+            userdetailed['/users/'+userNumber+'/userProfile']=userProfile;   //setting userdetails to object. user details are stored in realtime database of firebase  
+            
+            debug && console.log(userdetailed);
+            
+            debug && console.log("App.js - creating reference to real time storage");
 
-                var database = firebase.database();   
+            var database = firebase.database();   
 
-                console.log("App.js - storing userdetails to storage");
-                
-                await database.ref().update(userdetailed);   //details stored  
-                
-                console.log("App.js - storing userdetails to local storage");
+            debug && console.log("App.js - storing userdetails to storage");
+            
+            await database.ref().update(userdetailed);   //details stored  
+            
+            debug && console.log("App.js - storing userdetails to local storage");
 
-                await AsyncStorage.setItem('userNumber',userNumber);            //set all details in local storage of phone
-                await AsyncStorage.setItem('userName',userName);
-                await AsyncStorage.setItem('userState',userState);
-                await AsyncStorage.setItem('userProfile',userProfile);
+            await AsyncStorage.setItem('userNumber',userNumber);            //set all details in local storage of phone
+            await AsyncStorage.setItem('userName',userName);
+            await AsyncStorage.setItem('userState',userState);
+            await AsyncStorage.setItem('userProfile',userProfile);
 
-                console.log("App.js - setting global variable to usernumber");
+            debug && console.log("App.js - setting global variable to usernumber");
 
-                GLOBAL.userNumber=userNumber;      //setting global variable
+            GLOBAL.userNumber=userNumber;      //setting global variable
 
-                console.log("App.js - calling login dispatch function");
+            debug && console.log("App.js - calling login dispatch function");
 
-                dispatch({type:'LOGIN',userNumber:userNumber,userName:userName,userState:userState,userProfile:userProfile});  // calling dispatcher action for login ... this action is in ./helpers/Reduceractions  
-            }
-            catch(e)
-            {
-                ToastAndroid.show("Some error occurred! Try again",ToastAndroid.SHORT);
-                console.log("App.js - some error occured while logging userin");
-                console.log(e);
-            }
+            dispatch({type:'LOGIN',userNumber:userNumber,userName:userName,userState:userState,userProfile:userProfile});  // calling dispatcher action for login ... this action is in ./helpers/Reduceractions  
+          }
+          catch(e)
+          {
+            ToastAndroid.show("Some error occurred! Try again",ToastAndroid.SHORT);
+            
+            debug && console.log("App.js - some error occured while logging userin");
+            debug && console.log(e);
+          }
 
-            set_activityIndicator(false);
+          set_activityIndicator(false);
 
-            console.log("App.js - activity indicator hide");
+          debug && console.log("App.js - activity indicator hide");
         },
 
         logOut: async()=>		//for signing user out 
         {
-          console.log("App.js - logout function called");   
+          debug && console.log("App.js - logout function called");   
           
           set_activityIndicator(true);
 
-          console.log("App.js - activity indicator showed");
+          debug && console.log("App.js - activity indicator showed");
 
           try				
           { 
-              console.log("App.js - deleting userdetails from phone storage");
+            debug && console.log("App.js - deleting userdetails from phone storage");
 
-              await  AsyncStorage.removeItem('userNumber');   //removing usernumber,userprofile,etc from local storage
-              await  AsyncStorage.removeItem('userState');
-              await  AsyncStorage.removeItem('userName');
-              await  AsyncStorage.removeItem('userProfile');
+            await  AsyncStorage.removeItem('userNumber');   //removing usernumber,userprofile,etc from local storage
+            await  AsyncStorage.removeItem('userState');
+            await  AsyncStorage.removeItem('userName');
+            await  AsyncStorage.removeItem('userProfile');
 
-              console.log("App.js - setting global variable to null");
+            debug && console.log("App.js - setting global variable to null");
 
-              GLOBAL.userNumber='';    //setting global variable to null
+            GLOBAL.userNumber='';    //setting global variable to null
 
-              console.log("App.js - calling logout dispatch function");
+            debug && console.log("App.js - calling logout dispatch function");
 
-              dispatch({type:'LOGOUT'});           //calling dispatcher action for logging out ... this action is in ./helpers/Reduceractions 
+            dispatch({type:'LOGOUT'});           //calling dispatcher action for logging out ... this action is in ./helpers/Reduceractions 
           } 
           catch(e)
           {
               ToastAndroid.show("Some error occurred! Try again",ToastAndroid.SHORT);
 
-              console.log("App.js - Some error ocurred while logging user out");
-              console.log(e);
+              debug && console.log("App.js - Some error ocurred while logging user out");
+              debug && console.log(e);
           }
 
-          console.log("App.js - activity indicator hiding");
+          debug && console.log("App.js - activity indicator hiding");
 
           set_activityIndicator(false);
         },
@@ -147,7 +150,7 @@ function App()
 
       try
       {
-        console.log("App.js - Getting userdetails from phone storage");
+        debug && console.log("App.js - Getting userdetails from phone storage");
 
         userNumber = await AsyncStorage.getItem('userNumber');      //getting phonenumber,name,profile,status from storage
         userName = await AsyncStorage.getItem('userName');
@@ -158,27 +161,27 @@ function App()
       {
         ToastAndroid.show("Some error occurred while getting login information.",ToastAndroid.SHORT);
         
-        console.log("App.js - Error occured while Getting userdetails from phone storage");
-        console.log(e);
+        debug && console.log("App.js - Error occured while Getting userdetails from phone storage");
+        debug && console.log(e);
       }
       
-      console.log("App.js - got these details from phone storage");
-      console.log(userNumber);
-      console.log(userName);
-      console.log(userState);
-      console.log(userProfile);
+      debug && console.log("App.js - got these details from phone storage");
+      debug && console.log(userNumber);
+      debug && console.log(userName);
+      debug && console.log(userState);
+      debug && console.log(userProfile);
 
-      console.log("App.js - calling dispatch retieve function");
+      debug && console.log("App.js - calling dispatch retieve function");
 
       dispatch({type:'RETRIEVE_STORED_DATA',userNumber:userNumber,userName:userName,userState:userState,userProfile:userProfile});        //calling dispatcher action for setting the data retrived ... this action is in ./helpers/Reduceractions 
       
-      console.log("App.js - setting global variable");
+      debug && console.log("App.js - setting global variable");
 
       GLOBAL.userNumber = userNumber;
       
       setTimeout(()=>
       {
-        console.log("App.js - hiding slpash screen");
+        debug && console.log("App.js - hiding slpash screen");
 
         SplashScreen.hide();
       },800);
@@ -188,7 +191,7 @@ function App()
   
   if(activityIndicator==true)
   {
-    console.log("App.js - showing activity indicator");
+    debug && console.log("App.js - showing activity indicator");
     
     return(
       <View style={{flex:1,justifyContent:'center',alignItems:'center',backgroundColor:'#3E4DC8'}}>
