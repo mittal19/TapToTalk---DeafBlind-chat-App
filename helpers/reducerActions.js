@@ -5,8 +5,7 @@ const Reduceractions = (prevState,action)=>
 
     case 'RETRIEVE_STORED_DATA':      //when phone number is retrieved from storage this is called
       return {
-        ...prevState,     //all previous states will remain as it is
-        isLoading:false,         
+        ...prevState,     //all previous states will remain as it is        
         userNumber:action.userNumber,    //setting phone number
         userName:action.userName,
         userState:action.userState,
@@ -16,7 +15,6 @@ const Reduceractions = (prevState,action)=>
     case 'LOGIN':          //when userdetails are filled this is called
       return {
         ...prevState,    //all previous states will remain as it is             
-        isLoading:false,
         userNumber:action.userNumber,    //setting phone number
         userName:action.userName,
         userState:action.userState,
@@ -26,7 +24,6 @@ const Reduceractions = (prevState,action)=>
     case 'LOGOUT':                //when logging out this is called
       return {
         ...prevState,    //all previous states will remain as it is
-        isLoading:false,
         userNumber:null,
         userName:null,
         userState:null,

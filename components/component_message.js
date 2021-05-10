@@ -110,6 +110,7 @@ export function component_message({route,navigation})
     console.log(message[0]);
     console.log(typeof message[0]);
     var timestamp = new Date().getTime();   ///get current time 
+    var date = new Date(timestamp);
     
     await firestore()
             .collection('Messages')
@@ -126,20 +127,37 @@ export function component_message({route,navigation})
                 console.log("Done");     //after sending print 'then' in console
               });
     
+    var recentMessages ={
+      id:message[0]._id,
+      text:message[0].text,
+      createdAt:
+        {
+          second:date.getSeconds(),
+          minute:date.getMinutes(),
+          hour:date.getHours(),
+          date:date.getDate(),
+          month:date.getMonth()+1,
+          year:date.getFullYear()
+        },
+      sender:message[0].user._id,
+      receiverProfile:details['receiver'].userProfile
+    };
+
     await firestore()
             .collection(details['sender'])
             .doc(details['receiver'].userNumber)
-            .set(message[0]).then(()=>
+            .set(recentMessages).then(()=>
             {
               console.log("Done");     //after sending print 'then' in console
             });
     await firestore()
             .collection(details['receiver'].userNumber)
             .doc(details['sender'])
-            .set(message[0]).then(()=>
+            .set(recentMessages).then(()=>
             {
               console.log("Done");     //after sending print 'then' in console
             });
+
   }
 
   return (

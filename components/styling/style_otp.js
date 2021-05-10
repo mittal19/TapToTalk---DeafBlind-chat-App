@@ -1,7 +1,7 @@
 import {StyleSheet, Dimensions} from 'react-native';
 
 export const {width, height} = Dimensions.get('window');
-console.log(height+" "+width);
+
 export default StyleSheet.create({
     container:{
         backgroundColor:"#ffffff",
@@ -58,10 +58,12 @@ export default StyleSheet.create({
     didnotrecieved:{
         fontSize:width/24,
         color:"#3E4DC8",
-        fontFamily:'Montserrat-SemiBold'
+        fontFamily:'Montserrat-SemiBold',
     },
     touchableopacitydidnotrecieved:{
-        marginVertical:height/18
+        marginVertical:height/18,
+        justifyContent:'center',
+        alignItems:'center'
     },
     touchableopacityViewKeyboardShow:{
         marginHorizontal:width/18,
