@@ -31,7 +31,7 @@ const Stack = createStackNavigator();    //for creating navigation between scree
 
 GLOBAL = require('./global');  //make access of global usernumber here
 
-const debug = true;   //set to false if you dont want logs
+const debug = false;   //set to false if you dont want logs
 
 function App()
 {
