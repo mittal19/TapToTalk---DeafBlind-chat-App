@@ -32,7 +32,7 @@ const Stack = createStackNavigator();    //for creating navigation between scree
 GLOBAL = require('./global');  //make access of global usernumber here
 
 const debug = false;   //set to false if you dont want logs
-const timeout= 8000;
+const timeout= 12000;
 
 function App()
 {
