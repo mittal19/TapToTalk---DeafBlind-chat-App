@@ -55,6 +55,7 @@ export default StyleSheet.create({
         justifyContent:'center'
     },
     logo:{
+        //in image 376 and 275 is width and height of logo   
         height:0.20*275*width/376,
         width:0.20*width
     },
