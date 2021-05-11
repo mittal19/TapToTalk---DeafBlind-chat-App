@@ -136,11 +136,16 @@ export function component_home({navigation})
             recentMessages.map((item,key)=>(
               
               <View key={item.id} style={{flexDirection:'row',alignItems:'center',marginVertical:8,borderWidth:2,width:width-40,borderColor:'#3E4DC8',padding:8,borderRadius:16}}>
-                <Image
-                  source={{ uri: item.senderProfile }}
-                  style={{width:48,height:48,borderRadius:44}}
-                  PlaceholderContent={<Text style={{fontSize:8}}>Image</Text>}
-                />
+                {
+                  item.senderProfile=="defaultProfile.png"?
+                  <View style={{width:44,height:44,borderRadius:44,borderWidth:1,borderColor:'#3E4DC8',justifyContent:'center',alignItems:'center'}}><Image style={{width:44,height:44,borderRadius:44}} source={require('../res/img/defaultProfile.png')}/></View>
+                  :
+                  <Image
+                    source={{ uri: item.senderProfile }}
+                    style={{width:48,height:48,borderRadius:44}}
+                    PlaceholderContent={<View style={{backgroundColor:'#ffffff',width:44,height:44,borderRadius:44}}><Image style={{width:44,height:44,borderRadius:44}} source={require('../res/img/defaultProfile.png')}/></View>}
+                  />
+                }
                 <TouchableOpacity style={{marginHorizontal:16,flex:1}} onPress={()=>function_openpersonalmessage(item)}>
                   <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
                     {
