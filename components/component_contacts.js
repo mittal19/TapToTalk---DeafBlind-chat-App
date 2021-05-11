@@ -4,161 +4,97 @@
 //THEN USER CAN CLICK ON A CONTACT TO NAVIGATE TO PERSONAL MESSAGE SCREEN OF SELECTED CONTACT
 
 import React,{useEffect,useState} from 'react';
-import {View,Text,TouchableOpacity,FlatList,Platform,PermissionsAndroid,ActivityIndicator,Modal,SafeAreaView,ToastAndroid,Dimensions,ScrollView} from 'react-native';
-import Contacts from 'react-native-contacts';
+import {View,Text,TouchableOpacity,ActivityIndicator,Modal,SafeAreaView,ToastAndroid,Dimensions,ScrollView} from 'react-native';
 import {firebase} from '../helpers/firebaseConfig';
-import storage from '@react-native-firebase/storage';
-import Icon from 'react-native-vector-icons/AntDesign';  
 import {Image} from 'react-native-elements';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 GLOBAL = require('../global');
+GLOBAL = require('../global2');
+GLOBAL = require('../global3');
 
 const {width, height} = Dimensions.get('window');
 
-export function component_contacts({navigation})
+const debug =  false;
+
+export function component_contacts({route,navigation})
 {
+  debug && console.log("-----");
+  debug && console.log("component_contacts.js");
+
   const sender = GLOBAL.userNumber;
   
   const dbref = firebase.database().ref();     //setting reference to real time database
   
-  const [activityIndicator,set_activityIndicator] = useState(true);
-  const [onTapToTalk,set_onTapToTalk] = useState([]);   //hold contacts on taptotalk
-  const [modalVisible, set_modalVisible] = useState(false);
-  const [openImg,set_openImg] = useState();
-  const [showProfile,set_showProfile] = useState(false);
+  const [onTapToTalk,set_onTapToTalk] = useState(route.params.onTapToTalk);   //hold contacts on taptotalk //getting data from previous screen
+  const [modalVisible, set_modalVisible] = useState(false);  //use to show image in large
+  const [openImg,set_openImg] = useState();   //store which img to show in large
 
   useEffect(async()=>
   {
-    var raw_Contacts=[];     //hold all phone contacts
+    debug && console.log("component_home.js - getting users on tap to talk");
 
-    if(Platform.OS == 'android')
+    try
     {
-      try
-      {
-        const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_CONTACTS);
+      var temp_typeof = typeof GLOBAL.formated_Contacts;   //getting globally stored formated contacts..to know about structure of formatedcontacts go in app.js... formated contacts userprofile is null and ontaptotalk property in null for every contact
+      var formated_Contacts;
+      if(temp_typeof=="string")    
+        formated_Contacts = JSON.parse(GLOBAL.formated_Contacts);   //if typeof formated contacts is string change it to object
+      else
+        formated_Contacts= GLOBAL.formated_Contacts;
 
-        if(granted === PermissionsAndroid.RESULTS.GRANTED)
+      debug && console.log("component_home.js - got formated_Contacts from global");
+      
+      var usersOnApp = await dbref.child('users').once('value').then(snap=>{return snap.val()});  //getting users from realtimedatabase
+
+      debug && console.log("component_home.js - got user on tap to talk");
+
+      for(var i=0;i<formated_Contacts.length;i++)    //for each contact of phone check if it exist on taptotalk or not
+      {     
+        var phoneNumber = formated_Contacts[i].userNumber;
+        if(usersOnApp[phoneNumber]!=undefined)    //if it exists then change properties of formated_contacts
         {
-          await Contacts.getAll().then(contacts =>   //getting all phone contacts
-            {
-              raw_Contacts=contacts;    
-            });
-
-          var formated_Contacts=[];
-
-          const usersOnApp = await dbref.child('users').once('value').then(snap=>{return snap.val()});
-          
-          var nonDuplicatePhoneNumbers={};
-
-          for(var i=0;i<raw_Contacts.length;i++)
-          {
-            if(raw_Contacts[i].phoneNumbers.length!=0) 
-            {
-              var phoneNumber = raw_Contacts[i].phoneNumbers[0].number;
-              phoneNumber = phoneNumber.replace(/\D/g,'').slice(-10);
-            
-              if(nonDuplicatePhoneNumbers[phoneNumber]==undefined)
-              {
-                nonDuplicatePhoneNumbers[phoneNumber]=1;
-              
-                var onTapToTalk = "No";
-                var userProfile = "";
-                
-                if(usersOnApp[phoneNumber]!=undefined)
-                {
-                  onTapToTalk = "Yes";
-                  userProfile = usersOnApp[phoneNumber].userProfile;
-                }
-                
-                formated_Contacts.push(
-                  {
-                    userNumber:phoneNumber,
-                    userName:raw_Contacts[i].displayName,
-                    onTapToTalk:onTapToTalk,
-                    userProfile:userProfile
-                  }
-                );
-              }
-            }
-          }
-          
-          formated_Contacts.sort(function(a,b)   //sorting 'on' according to their name
-          {
-            return a.userName.toLowerCase()>b.userName.toLowerCase();
-          });
-
-          set_onTapToTalk(formated_Contacts);
-          
-          set_activityIndicator(false);
-
-          var default_ProfileURL = await storage().ref('defaultProfile.png').getDownloadURL();
-          
-          for(var i=0;i<formated_Contacts.length;i++)
-          {
-            if(formated_Contacts[i].userProfile!="")
-            {
-              
-              if(formated_Contacts[i].userProfile!="defaultProfile.png")
-              { 
-                var ProfileURL = await storage().ref(formated_Contacts[i].userProfile).getDownloadURL(); 
-                formated_Contacts[i].userProfile = ProfileURL;
-              }
-              else
-              {
-                formated_Contacts[i].userProfile = default_ProfileURL;
-              }
-            }
-          }
-
-          set_onTapToTalk(formated_Contacts);
-          set_showProfile(true);
-        }
-        else
-        {
-          console.log("permission denied"); 
-          
-          navigation.goBack();   //permission denied to access contacts // going one screen back
-          ToastAndroid.show("Permission to access contacts denied",ToastAndroid.SHORT);  
+          formated_Contacts[i].onTapToTalk = "Yes";
+          formated_Contacts[i].userProfile = usersOnApp[phoneNumber].userProfile;
         }
       }
-      catch(err)
-      {
-        console.log(err);
 
-        navigation.goBack();    //some error occurred going one screen back
-        ToastAndroid.show("Permission to access contacts denied",ToastAndroid.SHORT);
-      }
+      set_onTapToTalk(formated_Contacts);  //display the updated formated_contacts
+      GLOBAL.formated_Contacts = formated_Contacts;    //change global value of formated_contact
+
+      debug && console.log("component_home.js - updated users on taptotalk changes formated_Contacts");
+ 
+      await AsyncStorage.setItem('onTapToTalk',JSON.stringify(formated_Contacts));   //stored updated formated_contacts in  local so that when next time user open contacts screen we have something to display instaed of just diplaying loader
+
+      debug && console.log("component_home.js - stored updated formated_contacts in  local so that when next time user open contacts screen we have something to display instaed of just diplaying loader");
     }
+    catch(err)
+    {
+      debug && console.log("component_home.js- error occured while getting users on taptotalk");
+      debug && console.log(err);
+
+      navigation.pop();
+      ToastAndroid.show("Some error occurred try again.",ToastAndroid.SHORT);
+    }      
   },[]);
   
   const function_openpersonalmessage = (receiver)=>{            //this function will be called when user clicks on specific contact to begin chatting
-    if(receiver.onTapToTalk=="false")       //checking if the contact user clicked on is on taptotalk or not
-    {
-      ToastAndroid.show("Not on TapToTalk! Invite them here.",ToastAndroid.LONG);        //if not then show this
-    }
-    else  //if user is on taptotalk
-    {
-      navigation.pop();  //this will poput current contacts component screen 
-      navigation.navigate('Message',{receiver,sender});       //this will navigate  to message component and passing userNumber and other details
-    }
+    
+    debug && console.log("component_home.js- open chat to begin chatting");
+    
+    navigation.pop();  //this will poput current contacts component screen 
+    navigation.navigate('Message',{receiver,sender});       //this will navigate  to message component and passing userNumber and other details
   }
 
   const function_openImg = (userProfile)=>
   {
-    if(userProfile!='https://firebasestorage.googleapis.com/v0/b/taptotalk-ce0f0.appspot.com/o/defaultProfile.png?alt=media&token=7c559b92-a6a2-4ba7-ace9-9cbb3a8d6d2c')
+    debug && console.log("component_home.js- open image");
+
+    if(userProfile!='defaultProfile.png')
     {
       set_openImg(userProfile);
       set_modalVisible(!modalVisible);
     }
-  }
-
-  if(activityIndicator)
-  {  
-    return(
-      <View style={{flex:1,justifyContent:'center',alignItems:'center',backgroundColor:'#3E4DC8'}}>
-        <ActivityIndicator size="large" color="#FFFFFF"/>
-      </View>
-    );
   }
  
   return( 
@@ -177,7 +113,7 @@ export function component_contacts({navigation})
               <Image
                   source={{uri:openImg}}
                   style={{width:width,height:width}}
-                  PlaceholderContent={<Text style={{fontSize:24}}>Image</Text>}
+                  PlaceholderContent={<Image style={{width:44,height:44,borderRadius:44}} source={require('../res/img/defaultProfile.png')}/>}
                 />
           </SafeAreaView>
       </Modal>
@@ -195,22 +131,15 @@ export function component_contacts({navigation})
                 item.onTapToTalk=="Yes"?
                 <View style={{flexDirection:'row',marginVertical:6,flex:1,alignItems:'center'}}>
                   <TouchableOpacity onPress={()=>function_openImg(item.userProfile)} style={{backgroundColor:'#ffffff',width:44,height:44,borderRadius:44}}>
-                    {
-                      showProfile?
-                      <Image
-                        source={{ uri: item.userProfile}}
-                        style={{width:44,height:44,borderRadius:44}}
-                        PlaceholderContent={<Text style={{fontSize:8}}>Image</Text>}
-                      />
-                      :
-                      <View style={{width:44,height:44,borderRadius:44,justifyContent:'center',alignItems:'center'}}>
-                        <ActivityIndicator size="small" color="#3E4DC8"/>
-                      </View>
-                    }
+                    <Image
+                      source={{ uri: item.userProfile}}
+                      style={{width:44,height:44,borderRadius:44}}
+                      PlaceholderContent={<View style={{backgroundColor:'#ffffff',width:44,height:44,borderRadius:44}}><Image style={{width:44,height:44,borderRadius:44}} source={require('../res/img/defaultProfile.png')}/></View>}
+                    />
                   </TouchableOpacity>
                   
                   <TouchableOpacity onPress={()=>function_openpersonalmessage(item)} style={{flex:1,justifyContent:'center',marginLeft:16,backgroundColor:'#ffffff',height:48,flex:1,borderRadius:8}}>
-                    <Text style={{marginLeft:12,fontSize:18,color:'#3E4DC8',fontFamily:'Montserrat-Medium'}}>{item.userName}</Text>
+                    <Text numberOfLines={1} style={{marginLeft:12,fontSize:18,color:'#3E4DC8',fontFamily:'Montserrat-Medium'}}>{item.userName}</Text>
                   </TouchableOpacity>
                 </View>
                 :
