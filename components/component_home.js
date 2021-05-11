@@ -1,32 +1,66 @@
 //here for now user can logout or see contacts 
 
 import React,{useState,useEffect} from 'react';
-import {View,Text,TouchableOpacity,ActivityIndicator,ScrollView,Image,Dimensions} from 'react-native';
+import {View,Text,TouchableOpacity,ActivityIndicator,ScrollView,Image,Dimensions,Modal} from 'react-native';
 import {AuthContext} from '../helpers/context';
 import firestore from '@react-native-firebase/firestore';
 import Icon from 'react-native-vector-icons/Ionicons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 const {width, height} = Dimensions.get('window');
 
-GLOBAL = require('../global');
+GLOBAL = require('../global');   //access usernumber 
+GLOBAL = require('../global2');   //access non duplicate number // help to get the name which the number is stored in user phone
+
+const debug = false;
+
 export function component_home({navigation})
 {
+  debug && console.log("-----");
+  debug && console.log("component_home.js"); 
+  
   const {logOut} = React.useContext(AuthContext);          //accessing auth context function logOut created at App.js file
 
-  const [recentMessages,set_recentMessages] = React.useState([]);
+  const [recentMessages,set_recentMessages] = React.useState([]);         //recent message 
   const [activityIndicator,set_activityIndicator] = React.useState(true);   // this usestate will decide whether to show activity indicator or not.
+  const [modalVisible, set_modalVisible] = useState(false);    
 
   const function_checkcontacts = async()=>     //this function will be called when userr click on contacts
   {       
-    navigation.navigate('Contacts');  //navigating to contacts component and passing userNumber to next screen
+    debug && console.log("component_home.js - check contacts button clicked");
+    
+    set_modalVisible(true);   //showing modal  // i am showing modal because there was a delay between contacts buton click  and screen showing becaus of asyncstorage .. 
+
+    var onTapToTalk=[];
+    try
+    {
+      onTapToTalk= await AsyncStorage.getItem('onTapToTalk');   //get from storage
+      onTapToTalk = JSON.parse(onTapToTalk);   ///string to object
+    }
+    catch(err)
+    {
+      console.log(err);
+    }
+   
+    debug && console.log("component_home.js - got ontaptotalk from async storage");
+
+    navigation.navigate('Contacts',{onTapToTalk});  //navigating to contacts component and passing ontaptotalk to next screen
+    
+    setTimeout(()=>   //setting this 0 time timeout because if we dont add timeout then modal first disapper then app move to next screen ..which was not looking good.
+    {
+      set_modalVisible(false);
+    },0);
   }
 
   useEffect(async()=>  //this will be automattically called is similar to component did mount
   { 
+    debug && console.log("component_home.js - gettin recent chats");
+
     const firestoreRef = firestore()
-                            .collection(GLOBAL.userNumber).orderBy('createdAt',"desc");
+                            .collection(GLOBAL.userNumber).orderBy('createdAt',"desc");   //referring to firestore ... sort by descending order according to usernumber
     
-    firestoreRef.onSnapshot(snapshot=>(
-      set_recentMessages(snapshot.docs.map(doc=>
+    firestoreRef.onSnapshot(snapshot=>(       //onsnapshot will listen to changes made in firestore .. we should listen to changes because .. if we dont listen then recent mesg screen will not update automatically when some body send message
+      set_recentMessages(snapshot.docs.map(doc=>   //set_recentMessages is usestate method created above 
         ({
           id:doc.data().id,
           sender:doc.id,
@@ -41,6 +75,19 @@ export function component_home({navigation})
     
   },[]);
 
+  const function_openpersonalmessage = (receiver)=>{            //this function will be called when user clicks on recents chats
+   
+    debug && console.log("component_home.js - user clicked on one of the recent chats");
+
+    var sender=GLOBAL.userNumber;
+      receiver={
+        userNumber:receiver.sender,
+        userProfile:receiver.senderProfile,
+      };
+
+    navigation.navigate('Message',{receiver,sender});       //this will navigate  to message component and passing userNumber and other details
+  }
+
   if(activityIndicator)
   {
     return(
@@ -52,6 +99,21 @@ export function component_home({navigation})
 
   return(
     <View style={{flex:1,backgroundColor:'#3E4DC8'}}>
+
+      <Modal
+          animationType="fade"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => 
+          {
+              set_modalVisible(!modalVisible);
+          }}>
+        
+        <View style={{flex:1,justifyContent:'center',alignItems:'center',backgroundColor:'#3E4DC8'}}>
+          <ActivityIndicator size="large" color="#FFFFFF" />
+        </View>
+      
+      </Modal>
 
       <View style={{height:56,justifyContent:'space-between',alignItems:'center',flexDirection:'row',marginHorizontal:20}}>
         
@@ -79,13 +141,18 @@ export function component_home({navigation})
                   style={{width:48,height:48,borderRadius:44}}
                   PlaceholderContent={<Text style={{fontSize:8}}>Image</Text>}
                 />
-                <View style={{marginHorizontal:16,flex:1}}>
+                <TouchableOpacity style={{marginHorizontal:16,flex:1}} onPress={()=>function_openpersonalmessage(item)}>
                   <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-                    <Text numberOfLines={1} style={{marginBottom:4,fontSize:18,fontFamily:'Montserrat-Medium'}}>{item.sender}</Text>
+                    {
+                      GLOBAL.contacts[item.sender]!=undefined?
+                      <Text numberOfLines={1} style={{marginBottom:4,fontSize:18,fontFamily:'Montserrat-Medium'}}>{GLOBAL.contacts[item.sender]}</Text>
+                      :
+                      <Text numberOfLines={1} style={{marginBottom:4,fontSize:18,fontFamily:'Montserrat-Medium'}}>{item.sender}</Text>
+                    }
                     <Text style={{marginBottom:4,fontSize:12}}>{item.createdAt.hour}:{item.createdAt.minute}</Text>
                   </View>
                   <Text numberOfLines={1} style={{fontSize:16}}>{item.text}</Text>
-                </View>
+                </TouchableOpacity>
               </View>
             ))
           }
@@ -96,6 +163,8 @@ export function component_home({navigation})
           style={{position:'absolute',right:28,bottom:16,backgroundColor:'#3E4DC8',height:44,width:44,justifyContent:'center',alignItems:'center',borderRadius:24}}>
           <Icon name="add" size={34} color="#ffffff"></Icon>
         </TouchableOpacity>
+        
+        <TouchableOpacity onPress={logOut}><Text>LOGOUT</Text></TouchableOpacity>
 
       </View>
 
