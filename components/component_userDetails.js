@@ -100,8 +100,10 @@ export function component_userDetails({route,navigation})
                     { 
                         debug && console.log("component_userDetails.js - storing success");
                         debug && console.log("component_userDetails.js - calling login function");
+                        
+                        var ProfileURL = await storage().ref(userProfileName).getDownloadURL();   ///get url of profile img stored in firebase
 
-                        logIn(userNumber,userName,userState,userProfileName);           //call function created in App.js using memo
+                        logIn(userNumber,userName,userState,ProfileURL);           //call function created in App.js using memo
                     } 
                     else
                     {
