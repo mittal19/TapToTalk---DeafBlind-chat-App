@@ -1,7 +1,6 @@
 /*When user click on app MainActivity.java will open splash screen.
 Then useEffect will check if phone storage has usernumber,username..like data.
 Then retrived data will be stored in loginstate using reterive function.
-Global username is set to whatever retreived
 After 800ms splashscreen hide function is called.800ms can be reduced or increased.
 If usernumber retrived was not null then show home screen
 Else show login screen.
@@ -28,13 +27,12 @@ import {component_contacts} from './components/component_contacts';
 import {component_message} from './components/component_message';
 import {component_userDetails} from './components/component_userDetails';
 
+GLOBAL = require('./global_formatedcontacts');
+GLOBAL = require('./global_userProfile');
+
 const Stack = createStackNavigator();    //for creating navigation between screens possible using stack navigator
 
-GLOBAL = require('./global');  //make access of global usernumber,non duplicates contacts with name,formated contacts here
-GLOBAL = require('./global2');
-GLOBAL = require('./global3');
-
-const debug = false;   //set to false if you dont want logs
+const debug = true;   //set to false if you dont want logs
 const timeout= 12000;
 
 function App()
@@ -83,15 +81,12 @@ function App()
       debug && console.log(formated_Contacts);
       debug && console.log(contacts);
 
+      GLOBAL.formated_Contacts = formated_Contacts;
+      GLOBAL.userProfile = userProfile;
+
       debug && console.log("App.js - calling dispatch retieve function");
 
       dispatch({type:'RETRIEVE_STORED_DATA',userNumber:userNumber,userName:userName,userState:userState,userProfile:userProfile});        //calling dispatcher action for setting the data retrived ... this action is in ./helpers/Reduceractions 
-      
-      debug && console.log("App.js - setting global variable");
-
-      GLOBAL.userNumber = userNumber;  //setting stored data in global var.
-      GLOBAL.contacts = contacts;
-      GLOBAL.formated_Contacts = formated_Contacts;
       
       setTimeout(()=>
       {
@@ -162,9 +157,7 @@ function App()
             await AsyncStorage.setItem('userState',userState);
             await AsyncStorage.setItem('userProfile',userProfile);
 
-            debug && console.log("App.js - setting global variable to usernumber");
-
-            GLOBAL.userNumber=userNumber;      //setting global variable
+            GLOBAL.userProfile = userProfile;
 
             if(Platform.OS == 'android')   //now access contacts
             { 
@@ -207,8 +200,6 @@ function App()
                     }
                   }
 
-                  GLOBAL.contacts = nonDuplicatePhoneNumbers;
-
                   debug && console.log("App.js - formatting done");
                   
                   formated_Contacts.sort(function(a,b) 
@@ -217,8 +208,6 @@ function App()
                   });
 
                   debug && console.log("App.js - sorting of formattd contacts done");
-
-                  GLOBAL.formated_Contacts = formated_Contacts;
 
                   await AsyncStorage.setItem("contacts",JSON.stringify(nonDuplicatePhoneNumbers),(err)=>
                   {
@@ -241,8 +230,13 @@ function App()
                   {
                      debug && console.log("App.js - error is: " + err);
                   });
+
+                  GLOBAL.formated_Contacts = formated_Contacts;
                   
                   debug && console.log("App.js - storing of formattd contacts done");
+                  debug && console.log("App.js - calling login dispatch function");
+
+                  dispatch({type:'LOGIN',userNumber:userNumber,userName:userName,userState:userState,userProfile:userProfile});  // calling dispatcher action for login ... this action is in ./helpers/Reduceractions  
                 }
                 else
                 {
@@ -259,10 +253,6 @@ function App()
                 ToastAndroid.show("Check your internet connection or Try again.",ToastAndroid.SHORT);
               }
             }
-
-            debug && console.log("App.js - calling login dispatch function");
-
-            dispatch({type:'LOGIN',userNumber:userNumber,userName:userName,userState:userState,userProfile:userProfile});  // calling dispatcher action for login ... this action is in ./helpers/Reduceractions  
           }
           catch(e)
           {
@@ -289,15 +279,17 @@ function App()
           { 
             debug && console.log("App.js - deleting userdetails from phone storage");
 
-            await  AsyncStorage.removeItem('userNumber');   //removing usernumber,userprofile,etc from local storage
-            await  AsyncStorage.removeItem('userState');
-            await  AsyncStorage.removeItem('userName');
-            await  AsyncStorage.removeItem('userProfile');
+            await AsyncStorage.removeItem('userNumber');   //removing usernumber,userprofile,etc from local storage
+            await AsyncStorage.removeItem('userState');
+            await AsyncStorage.removeItem('userName');
+            await AsyncStorage.removeItem('userProfile');
+            await AsyncStorage.removeItem('formated_Contacts');
+            await AsyncStorage.removeItem('contacts');
+            await AsyncStorage.removeItem('onTapToTalk');
 
-            debug && console.log("App.js - setting global variable to null");
-
-            GLOBAL.userNumber='';    //setting global variable to null
-
+            GLOBAL.formated_Contacts =[];
+            GLOBAL.userProfile='';
+            
             debug && console.log("App.js - calling logout dispatch function");
 
             dispatch({type:'LOGOUT'});           //calling dispatcher action for logging out ... this action is in ./helpers/Reduceractions 

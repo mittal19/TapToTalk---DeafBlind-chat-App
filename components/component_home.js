@@ -1,4 +1,4 @@
-//here for now user can logout or see contacts 
+//HERE RECENT CHATS ARE SHOWN
 
 import React,{useState,useEffect} from 'react';
 import {View,Text,TouchableOpacity,ActivityIndicator,ScrollView,Image,Dimensions,Modal} from 'react-native';
@@ -9,10 +9,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const {width, height} = Dimensions.get('window');
 
-GLOBAL = require('../global');   //access usernumber 
-GLOBAL = require('../global2');   //access non duplicate number // help to get the name which the number is stored in user phone
+GLOBAL = require('../global_userNumber');  //getting global var  /// this stores userNumber
+GLOBAL = require('../global_nonduplicates');   //this stores non duplicates
 
-const debug = false;
+const debug = true;
 
 export function component_home({navigation})
 {
@@ -24,6 +24,7 @@ export function component_home({navigation})
   const [recentMessages,set_recentMessages] = React.useState([]);         //recent message 
   const [activityIndicator,set_activityIndicator] = React.useState(true);   // this usestate will decide whether to show activity indicator or not.
   const [modalVisible, set_modalVisible] = useState(false);    
+
 
   const function_checkcontacts = async()=>     //this function will be called when userr click on contacts
   {       
@@ -43,7 +44,10 @@ export function component_home({navigation})
     }
    
     debug && console.log("component_home.js - got ontaptotalk from async storage");
+    debug && console.log(onTapToTalk);
 
+    if(onTapToTalk == null)
+      onTapToTalk = [];
     navigation.navigate('Contacts',{onTapToTalk});  //navigating to contacts component and passing ontaptotalk to next screen
     
     setTimeout(()=>   //setting this 0 time timeout because if we dont add timeout then modal first disapper then app move to next screen ..which was not looking good.
@@ -51,14 +55,21 @@ export function component_home({navigation})
       set_modalVisible(false);
     },0);
   }
+  
 
   useEffect(async()=>  //this will be automattically called is similar to component did mount
   { 
-    debug && console.log("component_home.js - gettin recent chats");
 
-    const firestoreRef = firestore()
-                            .collection(GLOBAL.userNumber).orderBy('createdAt',"desc");   //referring to firestore ... sort by descending order according to usernumber
+    debug && console.log("component_home.js - getting usernumber and nonduplicate contacts");
+
+    GLOBAL.userNumber = await AsyncStorage.getItem('userNumber');  //get usernumber and non duplicatecontacts from storage which ere stored in app.js during login
+    GLOBAL.nonduplicates = JSON.parse(await AsyncStorage.getItem('contacts'));
+
+    debug && console.log("component_home.js - gettin recent chats");
     
+    const firestoreRef = firestore()
+                          .collection(GLOBAL.userNumber).orderBy('createdAt',"desc");   //referring to firestore ... sort by descending order according to usernumber
+  
     firestoreRef.onSnapshot(snapshot=>(       //onsnapshot will listen to changes made in firestore .. we should listen to changes because .. if we dont listen then recent mesg screen will not update automatically when some body send message
       set_recentMessages(snapshot.docs.map(doc=>   //set_recentMessages is usestate method created above 
         ({
@@ -149,8 +160,8 @@ export function component_home({navigation})
                 <TouchableOpacity style={{marginHorizontal:16,flex:1}} onPress={()=>function_openpersonalmessage(item)}>
                   <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
                     {
-                      GLOBAL.contacts[item.sender]!=undefined?
-                      <Text numberOfLines={1} style={{marginBottom:4,fontSize:18,fontFamily:'Montserrat-Medium'}}>{GLOBAL.contacts[item.sender]}</Text>
+                      GLOBAL.nonduplicates[item.sender]!=undefined?
+                      <Text numberOfLines={1} style={{marginBottom:4,fontSize:18,fontFamily:'Montserrat-Medium'}}>{GLOBAL.nonduplicates[item.sender]}</Text>
                       :
                       <Text numberOfLines={1} style={{marginBottom:4,fontSize:18,fontFamily:'Montserrat-Medium'}}>{item.sender}</Text>
                     }

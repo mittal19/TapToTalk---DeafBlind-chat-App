@@ -9,8 +9,13 @@ then inside this collection there will be auto id generated docs where each docs
 
 */
 import React,{useState,useEffect} from 'react';
-import { GiftedChat } from 'react-native-gifted-chat';
+import {View,Text ,Image,Dimensions, TouchableOpacity,Modal} from 'react-native';
+import { GiftedChat, InputToolbar, Bubble} from 'react-native-gifted-chat';
 import firestore from '@react-native-firebase/firestore';
+
+const {width, height} = Dimensions.get('window');
+
+GLOBAL = require('../global_userProfile');
 
 export function component_message({route,navigation})
 {
@@ -19,6 +24,9 @@ export function component_message({route,navigation})
   const [messages,setMessages] = useState([]);    //messages will be stored in this
   const [aa,seta] = useState();         //smaller number will be stored here
   const [bb,setb] = useState();      //greater number will be stored here
+  const [modalVisible, set_modalVisible] = useState(false);  //use to show image in large
+  const [openImg,set_openImg] = useState();   //store which img to show in large
+  
   var a,b;   //temporary variables 
   
   useEffect(()=>          //will do some tast after rendering screen 
@@ -127,7 +135,7 @@ export function component_message({route,navigation})
                 console.log("Done");     //after sending print 'then' in console
               });
     
-    var recentMessages ={
+    var recentMessages_sender ={
       id:message[0]._id,
       text:message[0].text,
       createdAt:
@@ -143,30 +151,140 @@ export function component_message({route,navigation})
       receiverProfile:details['receiver'].userProfile
     };
 
+    var recentMessages_receiver ={
+      id:message[0]._id,
+      text:message[0].text,
+      createdAt:
+        {
+          second:date.getSeconds(),
+          minute:date.getMinutes(),
+          hour:date.getHours(),
+          date:date.getDate(),
+          month:date.getMonth()+1,
+          year:date.getFullYear()
+        },
+      sender:message[0].user._id,
+      receiverProfile:GLOBAL.userProfile
+    };
+
     await firestore()
             .collection(details['sender'])
             .doc(details['receiver'].userNumber)
-            .set(recentMessages).then(()=>
+            .set(recentMessages_sender).then(()=>
             {
               console.log("Done");     //after sending print 'then' in console
             });
     await firestore()
             .collection(details['receiver'].userNumber)
             .doc(details['sender'])
-            .set(recentMessages).then(()=>
+            .set(recentMessages_receiver).then(()=>
             {
               console.log("Done");     //after sending print 'then' in console
             });
-
   }
 
+  const function_openImg = (userProfile)=>
+  {
+    
+    if(userProfile!='defaultProfile.png')
+    {
+      set_openImg(userProfile);
+      set_modalVisible(!modalVisible);
+    }
+  }
+
+  const function_customtInputToolbar = props => 
+  {
+    return (
+      <InputToolbar
+        {...props}
+        containerStyle={{
+          borderTopColor: "#3E4DC8",
+          borderTopWidth: 2,
+          padding:4,
+          height:48,
+          fontSize:8,
+
+        }}
+      />
+    );
+  }
+
+  const function_renderBubble = (props) =>
+  {
+    return (
+      <Bubble
+        {...props}
+        wrapperStyle={{
+          right: {
+            backgroundColor: '#3E4DC8'
+          },
+          left:{
+            backgroundColor:'#3E4DC8'
+          }
+        }}
+      />
+    )
+  }
+
+  
+
   return (
+    <View style={{flex:1,backgroundColor:'#ffffff'}}>
+    
+    <Modal
+          animationType="fade"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => 
+          {
+              set_modalVisible(!modalVisible);
+          }}>
+
+          <View style={{flex:1,justifyContent:'center',alignItems:'center',height:height,width:width,backgroundColor:'#000000'}}>
+              <Image
+                  source={{uri:openImg}}
+                  style={{width:width,height:width}}
+                  PlaceholderContent={<Image style={{width:44,height:44,borderRadius:44}} source={require('../res/img/defaultProfile.png')}/>}
+                />
+          </View>
+      </Modal>
+
+    <View style={{height:56,justifyContent:'space-between',alignItems:'center',flexDirection:'row',paddingHorizontal:20,backgroundColor:'#3E4DC8'}}>
+        
+        <TouchableOpacity onPress={()=>function_openImg(details['receiver'].userProfile)} style={{}}>
+          {
+            details['receiver'].userProfile=="defaultProfile.png"?
+            <View style={{width:40,height:40,borderRadius:44,justifyContent:'center',alignItems:'center'}}>
+              <Image style={{width:40,height:40,borderRadius:44}} source={require('../res/img/defaultProfile.png')}/>
+            </View>
+            :
+            <Image
+              source={{ uri: details['receiver'].userProfile }}
+              style={{width:40,height:40,borderRadius:44}}
+              PlaceholderContent={
+                <View style={{backgroundColor:'#ffffff',width:40,height:40,borderRadius:44}}>
+                  <Image style={{width:40,height:40,borderRadius:44}} source={require('../res/img/defaultProfile.png')}/>
+                </View>}
+            />
+          }
+        </TouchableOpacity>
+        
+        <Text style={{color:'#ffffff',fontSize:22,fontFamily:'Montserrat-Regular'}}>Messages</Text>
+        
+        <View style={{height:40,width:40}} />
+
+    </View>
+    
     <GiftedChat             
       messages={messages}    //messages usestate declared above
       onSend={message => sendtofirebase(message)}         //when clicked send button
+      renderInputToolbar={props => function_customtInputToolbar(props)}
+      renderBubble={props => function_renderBubble(props)}
       user={{
         _id:details['sender'],    //my usernumber will be here...usernumber whose number is loggen in now...
       }}
     />
+    </View>
   )
 }

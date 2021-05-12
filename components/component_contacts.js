@@ -9,13 +9,13 @@ import {firebase} from '../helpers/firebaseConfig';
 import {Image} from 'react-native-elements';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-GLOBAL = require('../global');
-GLOBAL = require('../global2');
-GLOBAL = require('../global3');
+GLOBAL = require('../global_userNumber');
+GLOBAL = require('../global_nonduplicates');
+GLOBAL = require('../global_formatedcontacts');
 
 const {width, height} = Dimensions.get('window');
 
-const debug =  false;
+const debug =  true;
 
 export function component_contacts({route,navigation})
 {
@@ -32,12 +32,13 @@ export function component_contacts({route,navigation})
 
   useEffect(async()=>
   {
-    debug && console.log("component_home.js - getting users on tap to talk");
+    debug && console.log("component_contacts.js - getting users on tap to talk");
 
     try
     {
       var temp_typeof = typeof GLOBAL.formated_Contacts;   //getting globally stored formated contacts..to know about structure of formatedcontacts go in app.js... formated contacts userprofile is null and ontaptotalk property in null for every contact
       var formated_Contacts;
+      
       if(temp_typeof=="string")    
         formated_Contacts = JSON.parse(GLOBAL.formated_Contacts);   //if typeof formated contacts is string change it to object
       else
