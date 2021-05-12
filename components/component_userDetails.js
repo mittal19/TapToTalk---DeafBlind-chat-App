@@ -11,7 +11,7 @@ import storage from '@react-native-firebase/storage';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {Picker} from '@react-native-picker/picker';
 
-const debug = false;
+const debug = true;
 const timeout = 10000; //to set timeout .. how much time we will wait for firebase to store profile in storage
 
 export function component_userDetails({route,navigation})
@@ -100,8 +100,10 @@ export function component_userDetails({route,navigation})
                     { 
                         debug && console.log("component_userDetails.js - storing success");
                         debug && console.log("component_userDetails.js - calling login function");
+                        
+                        var ProfileURL = await storage().ref(userProfileName).getDownloadURL();   ///get url of profile img stored in firebase
 
-                        logIn(userNumber,userName,userState,userProfileName);           //call function created in App.js using memo
+                        logIn(userNumber,userName,userState,ProfileURL);           //call function created in App.js using memo
                     } 
                     else
                     {

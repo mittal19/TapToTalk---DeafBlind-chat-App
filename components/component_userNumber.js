@@ -268,7 +268,7 @@ import styles,{width,height} from './styling/style_userNumber';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/AntDesign';
 
-const debug = false;
+const debug = true;
 const API = 'http://192.168.43.13:3000/request'; //go in dev settings of phone by open developer mode by typing d in nodejs server then go to debug server host and enter ip adreess like 192.168.43.13:8081 . here 8081 is mobile port number. keep local host port number 3000
 const timeout = 8000; //to set timeout .. how much time we will wait for api to send response of fetch request
 

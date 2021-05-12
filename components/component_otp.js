@@ -274,7 +274,7 @@ import OTPInputView from '@twotalltotems/react-native-otp-input';
 import styles,{width} from './styling/style_otp';
 import LinearGradient from 'react-native-linear-gradient';
 
-const debug = false;
+const debug = true;
 const API = 'http://192.168.43.13:3000/verify';  //go in dev settings of phone by open developer mode by typing d in nodejs server then go to debug server host and enter ip adreess like 192.168.43.13:8081 . here 8081 is mobile port number. keep local host port number 3000
 const timeout = 8000; //to set timeout .. how much time we will wait for api to send response of fetch request
 

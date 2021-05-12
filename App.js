@@ -1,7 +1,6 @@
 /*When user click on app MainActivity.java will open splash screen.
 Then useEffect will check if phone storage has usernumber,username..like data.
 Then retrived data will be stored in loginstate using reterive function.
-Global username is set to whatever retreived
 After 800ms splashscreen hide function is called.800ms can be reduced or increased.
 If usernumber retrived was not null then show home screen
 Else show login screen.
@@ -9,11 +8,12 @@ Stack navigator for navigating between screens
 */
  
 import React,{useEffect} from 'react';
-import {View,ToastAndroid,ActivityIndicator} from 'react-native';
+import {View,ToastAndroid,ActivityIndicator,Platform,PermissionsAndroid} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SplashScreen from 'react-native-splash-screen';
+import Contacts from 'react-native-contacts';
 
 import {AuthContext} from './helpers/context';		
 import {Reduceractions} from './helpers/reducerActions';    
@@ -27,12 +27,13 @@ import {component_contacts} from './components/component_contacts';
 import {component_message} from './components/component_message';
 import {component_userDetails} from './components/component_userDetails';
 
+GLOBAL = require('./global_formatedcontacts');
+GLOBAL = require('./global_userProfile');
+
 const Stack = createStackNavigator();    //for creating navigation between screens possible using stack navigator
 
-GLOBAL = require('./global');  //make access of global usernumber here
-
-const debug = false;   //set to false if you dont want logs
-const timeout= 8000;
+const debug = true;   //set to false if you dont want logs
+const timeout= 12000;
 
 function App()
 {
@@ -50,6 +51,8 @@ function App()
       let userName = null;
       let userState = null;
       let userProfile = null;
+      let formated_Contacts =null;
+      let contacts = null;
 
       try
       {
@@ -59,6 +62,8 @@ function App()
         userName = await AsyncStorage.getItem('userName');
         userState = await AsyncStorage.getItem('userState');
         userProfile = await AsyncStorage.getItem('userProfile');
+        formated_Contacts = await AsyncStorage.getItem('formated_Contacts');   //gettin formatted contacts. non duplicate contacts
+        contacts = await AsyncStorage.getItem('contacts');
       }
       catch(e)
       {
@@ -73,14 +78,15 @@ function App()
       debug && console.log(userName);
       debug && console.log(userState);
       debug && console.log(userProfile);
+      debug && console.log(formated_Contacts);
+      debug && console.log(contacts);
+
+      GLOBAL.formated_Contacts = formated_Contacts;
+      GLOBAL.userProfile = userProfile;
 
       debug && console.log("App.js - calling dispatch retieve function");
 
       dispatch({type:'RETRIEVE_STORED_DATA',userNumber:userNumber,userName:userName,userState:userState,userProfile:userProfile});        //calling dispatcher action for setting the data retrived ... this action is in ./helpers/Reduceractions 
-      
-      debug && console.log("App.js - setting global variable");
-
-      GLOBAL.userNumber = userNumber;
       
       setTimeout(()=>
       {
@@ -151,13 +157,102 @@ function App()
             await AsyncStorage.setItem('userState',userState);
             await AsyncStorage.setItem('userProfile',userProfile);
 
-            debug && console.log("App.js - setting global variable to usernumber");
+            GLOBAL.userProfile = userProfile;
 
-            GLOBAL.userNumber=userNumber;      //setting global variable
+            if(Platform.OS == 'android')   //now access contacts
+            { 
+              var raw_Contacts=[];     //hold all phone contacts
 
-            debug && console.log("App.js - calling login dispatch function");
+              debug && console.log("App.js - getting contacts");
+              try
+              {
+                const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_CONTACTS);
+                if(granted === PermissionsAndroid.RESULTS.GRANTED)
+                {
+                  await Contacts.getAll().then(contacts =>   //getting all phone contacts
+                    {
+                      raw_Contacts=contacts;    
+                    });
 
-            dispatch({type:'LOGIN',userNumber:userNumber,userName:userName,userState:userState,userProfile:userProfile});  // calling dispatcher action for login ... this action is in ./helpers/Reduceractions  
+                  debug && console.log("App.js - got contacts");
+                  
+                  var formated_Contacts=[];   //store contacts in a format
+                  var nonDuplicatePhoneNumbers={};         //store non duplicate numbers with their name as  given by user
+                  for(var i=0;i<raw_Contacts.length;i++)
+                  {
+                    if(raw_Contacts[i].phoneNumbers.length!=0)   //check if number exist or its null
+                    {
+                      var phoneNumber = raw_Contacts[i].phoneNumbers[0].number;
+                      phoneNumber = phoneNumber.replace(/\D/g,'').slice(-10);   //formatting number -- removing spaces and +91
+
+                      if(nonDuplicatePhoneNumbers[phoneNumber]==undefined)    //this will allow only numbers which are not seen previously
+                      {
+                        nonDuplicatePhoneNumbers[phoneNumber]=raw_Contacts[i].displayName;
+                        formated_Contacts.push(
+                          {
+                            userNumber:phoneNumber,
+                            userName:raw_Contacts[i].displayName,
+                            onTapToTalk:"No",
+                            userProfile:""
+                          }
+                        );
+                      }
+                    }
+                  }
+
+                  debug && console.log("App.js - formatting done");
+                  
+                  formated_Contacts.sort(function(a,b) 
+                  {
+                    return a.userName.toLowerCase()>b.userName.toLowerCase();
+                  });
+
+                  debug && console.log("App.js - sorting of formattd contacts done");
+
+                  await AsyncStorage.setItem("contacts",JSON.stringify(nonDuplicatePhoneNumbers),(err)=>
+                  {
+                    if(err)
+                      throw err;
+                    debug && console.log("App.js - success");
+                  }).catch((err)=> 
+                  {
+                     debug && console.log("App.js - error is: " + err);
+                  });
+
+                  debug && console.log("App.js - stored non duplicate contacts");
+                  
+                  await AsyncStorage.setItem("formated_Contacts",JSON.stringify(formated_Contacts),(err)=>
+                  {
+                    if(err)
+                      throw err;
+                    debug && console.log("App.js - success");
+                  }).catch((err)=> 
+                  {
+                     debug && console.log("App.js - error is: " + err);
+                  });
+
+                  GLOBAL.formated_Contacts = formated_Contacts;
+                  
+                  debug && console.log("App.js - storing of formattd contacts done");
+                  debug && console.log("App.js - calling login dispatch function");
+
+                  dispatch({type:'LOGIN',userNumber:userNumber,userName:userName,userState:userState,userProfile:userProfile});  // calling dispatcher action for login ... this action is in ./helpers/Reduceractions  
+                }
+                else
+                {
+                  debug && console.log("App.js - permission denied"); 
+                  
+                  ToastAndroid.show("Could not login Permission to access contacts denied",ToastAndroid.SHORT);  
+                }
+              }
+              catch(err)
+              {
+                debug && console.log("App.js - error while getting or saving contacts");
+                debug && console.log(err);
+
+                ToastAndroid.show("Check your internet connection or Try again.",ToastAndroid.SHORT);
+              }
+            }
           }
           catch(e)
           {
@@ -184,15 +279,17 @@ function App()
           { 
             debug && console.log("App.js - deleting userdetails from phone storage");
 
-            await  AsyncStorage.removeItem('userNumber');   //removing usernumber,userprofile,etc from local storage
-            await  AsyncStorage.removeItem('userState');
-            await  AsyncStorage.removeItem('userName');
-            await  AsyncStorage.removeItem('userProfile');
+            await AsyncStorage.removeItem('userNumber');   //removing usernumber,userprofile,etc from local storage
+            await AsyncStorage.removeItem('userState');
+            await AsyncStorage.removeItem('userName');
+            await AsyncStorage.removeItem('userProfile');
+            await AsyncStorage.removeItem('formated_Contacts');
+            await AsyncStorage.removeItem('contacts');
+            await AsyncStorage.removeItem('onTapToTalk');
 
-            debug && console.log("App.js - setting global variable to null");
-
-            GLOBAL.userNumber='';    //setting global variable to null
-
+            GLOBAL.formated_Contacts =[];
+            GLOBAL.userProfile='';
+            
             debug && console.log("App.js - calling logout dispatch function");
 
             dispatch({type:'LOGOUT'});           //calling dispatcher action for logging out ... this action is in ./helpers/Reduceractions 

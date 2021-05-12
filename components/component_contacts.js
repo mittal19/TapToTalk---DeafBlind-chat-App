@@ -4,179 +4,102 @@
 //THEN USER CAN CLICK ON A CONTACT TO NAVIGATE TO PERSONAL MESSAGE SCREEN OF SELECTED CONTACT
 
 import React,{useEffect,useState} from 'react';
-import {View,Text,TouchableOpacity,FlatList,Platform,PermissionsAndroid,ActivityIndicator,Modal,SafeAreaView,ToastAndroid,Dimensions,ScrollView} from 'react-native';
-import Contacts from 'react-native-contacts';
+import {View,Text,TouchableOpacity,ActivityIndicator,Modal,SafeAreaView,ToastAndroid,Dimensions,ScrollView} from 'react-native';
 import {firebase} from '../helpers/firebaseConfig';
-import storage from '@react-native-firebase/storage';
-import Icon from 'react-native-vector-icons/AntDesign';  
 import {Image} from 'react-native-elements';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-GLOBAL = require('../global');
+GLOBAL = require('../global_userNumber');
+GLOBAL = require('../global_nonduplicates');
+GLOBAL = require('../global_formatedcontacts');
 
 const {width, height} = Dimensions.get('window');
 
-export function component_contacts({navigation})
+const debug =  true;
+
+export function component_contacts({route,navigation})
 {
+  debug && console.log("-----");
+  debug && console.log("component_contacts.js");
 
   const sender = GLOBAL.userNumber;
   
   const dbref = firebase.database().ref();     //setting reference to real time database
-  const [isLoading,set_isLoading] = useState(true);
-  const [onTapToTalk,set_onTapToTalk] = useState([]);   //hold contacts on taptotalk
-  const [notTapToTalk,set_notTapToTalk] = useState([]);   //hold contacts not on taptotalk
-  const [modalVisible, set_modalVisible] = useState(false);
-  const [openImg,set_openImg] = useState();
+  
+  const [onTapToTalk,set_onTapToTalk] = useState(route.params.onTapToTalk);   //hold contacts on taptotalk //getting data from previous screen
+  const [modalVisible, set_modalVisible] = useState(false);  //use to show image in large
+  const [openImg,set_openImg] = useState();   //store which img to show in large
 
-  useEffect(()=>
+  useEffect(async()=>
   {
-      async function functionname()   //creating a function with name of 'functionname' 
-      {
-        var contacts=[];     //hold all phone contacts
+    debug && console.log("component_contacts.js - getting users on tap to talk");
 
-        if(Platform.OS == 'android')
+    try
+    {
+      var temp_typeof = typeof GLOBAL.formated_Contacts;   //getting globally stored formated contacts..to know about structure of formatedcontacts go in app.js... formated contacts userprofile is null and ontaptotalk property in null for every contact
+      var formated_Contacts;
+      
+      if(temp_typeof=="string")    
+        formated_Contacts = JSON.parse(GLOBAL.formated_Contacts);   //if typeof formated contacts is string change it to object
+      else
+        formated_Contacts= GLOBAL.formated_Contacts;
+
+      debug && console.log("component_home.js - got formated_Contacts from global");
+      
+      var usersOnApp = await dbref.child('users').once('value').then(snap=>{return snap.val()});  //getting users from realtimedatabase
+
+      debug && console.log("component_home.js - got user on tap to talk");
+
+      for(var i=0;i<formated_Contacts.length;i++)    //for each contact of phone check if it exist on taptotalk or not
+      {     
+        var phoneNumber = formated_Contacts[i].userNumber;
+        if(usersOnApp[phoneNumber]!=undefined)    //if it exists then change properties of formated_contacts
         {
-          try
-          {
-            const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_CONTACTS);
-
-            if(granted === PermissionsAndroid.RESULTS.GRANTED)
-            {
-              await Contacts.getAll().then(cont =>   //getting all phone contacts
-                {
-                  contacts=cont;    
-                });
-              console.log("in1");
-
-              const query = await dbref.child('users');   //refering to users in realtime database
-              const users = await query.once('value')    //users variable will have details of all users on taptotalk
-                                    .then(
-                                      function(snap)
-                                      {
-                                        return snap.val();
-                                      }
-                                    );
-              console.log("in2");
-              var on=[];    //temporary variable will hold users on taptotalk
-              var not=[];   ////temporary variable will hold users not on taptotalk
-              var x=0;    //index for on variable
-              var y=0;   //index for not variable
-              for(var i=0;i<contacts.length;i++)
-              {
-                if(contacts[i].phoneNumbers.length!=0)    //if phone contact have no number
-                {
-
-                  var tempphonenumber = contacts[i].phoneNumbers[0].number;
-                  tempphonenumber = tempphonenumber.replace(/\D/g,'').slice(-10);
-
-                  if(users[tempphonenumber]!=undefined)    //if phone contact is present on tap to talk
-                  {
-                    var profilename = users[tempphonenumber].userProfile;
-                    var profileLink= await storage().ref('defaultProfile.png').getDownloadURL();
-                    if(profilename!='defaultProfile.png')
-                    {
-                      profileLink = await storage().ref(profilename).getDownloadURL();  
-                    }
-
-                    var enrty =    //creating a entry for 'on' array
-                    {
-                      id:x,   //index
-                      userName:contacts[i].displayName,
-                      userNumber:tempphonenumber,
-                      userProfile:profileLink,
-                    };
-                    x++;
-                    on.push(enrty);
-                  }
-                  else
-                  {    ///contacs of phone not on taptotalk
-                    var profileLink = 'https://www.pngitem.com/pimgs/m/150-1503945_transparent-user-png-default-user-image-png-png.png';
-                    var enrty =    //creating entty for 'not' array
-                    {
-                      id:y,    //index
-                      userName:contacts[i].displayName,
-                      userNumber:tempphonenumber,
-                      userProfile:'',
-                    };
-                    y++;
-                    not.push(enrty);
-                  } 
-                }
-              }
-
-              console.log("in3");
-
-              on.sort(function(a,b)   //sorting 'on' according to their first name
-              {
-                return a.userName.toLowerCase()>b.userName.toLowerCase();
-              });
-              not.sort(function(a,b)   //sorting 'not' acc. to first name
-              {
-                return a.userName.toLowerCase()>b.userName.toLowerCase();
-              });
-
-              console.log("in4");
-
-              set_onTapToTalk(on);   //setting usestate
-              set_notTapToTalk(not);  //setting usestate
-              set_isLoading(false);  
-            }
-            else
-            {
-              console.log("permission denied"); 
-              navigation.goBack();   //permission denied to access contacts // going one screen back
-              ToastAndroid.show("Permission to access contacts denied",ToastAndroid.LONG);  
-            }
-          }
-          catch(err)
-          {
-            console.log(err);
-            navigation.goBack();    //some error occurred going one screen back
-            ToastAndroid.show("Permission to access contacts denied",ToastAndroid.LONG);
-          }
+          formated_Contacts[i].onTapToTalk = "Yes";
+          formated_Contacts[i].userProfile = usersOnApp[phoneNumber].userProfile;
         }
       }
-      functionname();    //calling above function
-    },[]);
-  
-  const openpersonalmessage = (receiver)=>{            //this function will be called when user clicks on specific contact to begin chatting
-    if(receiver.onTapToTalk=="false")       //checking if the contact user clicked on is on taptotalk or not
-    {
-      ToastAndroid.show("Not on TapToTalk! Invite them here.",ToastAndroid.LONG);        //if not then show this
-    }
-    else  //if user is on taptotalk
-    {
-      navigation.pop();  //this will poput current contacts component screen 
-      navigation.navigate('Message',{receiver,sender});       //this will navigate  to message component and passing userNumber and other details
-    }
-  }
 
-  const invitethem = (receiver)=>
-  {
-    //showing toast when clicked on user who is not on taptotalk
-    console.log(receiver);
-    ToastAndroid.show(receiver.userName +" is not on TapToTalk! Invite them here.",ToastAndroid.SHORT);
+      set_onTapToTalk(formated_Contacts);  //display the updated formated_contacts
+      GLOBAL.formated_Contacts = formated_Contacts;    //change global value of formated_contact
+
+      debug && console.log("component_home.js - updated users on taptotalk changes formated_Contacts");
+ 
+      await AsyncStorage.setItem('onTapToTalk',JSON.stringify(formated_Contacts));   //stored updated formated_contacts in  local so that when next time user open contacts screen we have something to display instaed of just diplaying loader
+
+      debug && console.log("component_home.js - stored updated formated_contacts in  local so that when next time user open contacts screen we have something to display instaed of just diplaying loader");
+    }
+    catch(err)
+    {
+      debug && console.log("component_home.js- error occured while getting users on taptotalk");
+      debug && console.log(err);
+
+      navigation.pop();
+      ToastAndroid.show("Some error occurred try again.",ToastAndroid.SHORT);
+    }      
+  },[]);
+  
+  const function_openpersonalmessage = (receiver)=>{            //this function will be called when user clicks on specific contact to begin chatting
+    
+    debug && console.log("component_home.js- open chat to begin chatting");
+    
+    navigation.pop();  //this will poput current contacts component screen 
+    navigation.navigate('Message',{receiver,sender});       //this will navigate  to message component and passing userNumber and other details
   }
 
   const function_openImg = (userProfile)=>
   {
-    if(userProfile!='https://firebasestorage.googleapis.com/v0/b/taptotalk-ce0f0.appspot.com/o/defaultProfile.png?alt=media&token=7c559b92-a6a2-4ba7-ace9-9cbb3a8d6d2c')
+    debug && console.log("component_home.js- open image");
+
+    if(userProfile!='defaultProfile.png')
     {
       set_openImg(userProfile);
       set_modalVisible(!modalVisible);
     }
   }
-
-  if(isLoading==true)
-  {  //showin loader  till contacts is not fetched
-    return(
-      <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
-        <ActivityIndicator size="large" color="#3E4DC8"/>
-      </View>
-    );
-  }
  
   return( 
-    <ScrollView style={{backgroundColor:'#3E4DC8'}}>
+    <View style={{flex:1,backgroundColor:'#3E4DC8'}}>
 
       <Modal
           animationType="fade"
@@ -191,40 +114,46 @@ export function component_contacts({navigation})
               <Image
                   source={{uri:openImg}}
                   style={{width:width,height:width}}
-                  PlaceholderContent={<Text style={{fontSize:24}}>Image</Text>}
+                  PlaceholderContent={<Image style={{width:44,height:44,borderRadius:44}} source={require('../res/img/defaultProfile.png')}/>}
                 />
           </SafeAreaView>
       </Modal>
 
-      <SafeAreaView style={{marginHorizontal:16}}>
+    
+    <View style={{marginHorizontal:16}}>
+      
+      <Text style={{color:'#DCDCDC',fontSize:18,fontFamily:'Montserrat-Regular',marginTop:16}}>Contacts</Text>
+      
+      <ScrollView style={{ marginVertical:16}}>
+        {
+          onTapToTalk.map((item,key)=>(
+            <View key={item.userNumber} >
+              {
+                item.onTapToTalk=="Yes"?
+                <View style={{flexDirection:'row',marginVertical:6,flex:1,alignItems:'center'}}>
+                  <TouchableOpacity onPress={()=>function_openImg(item.userProfile)} style={{backgroundColor:'#ffffff',width:44,height:44,borderRadius:44}}>
+                    <Image
+                      source={{ uri: item.userProfile}}
+                      style={{width:44,height:44,borderRadius:44}}
+                      PlaceholderContent={<View style={{backgroundColor:'#ffffff',width:44,height:44,borderRadius:44}}><Image style={{width:44,height:44,borderRadius:44}} source={require('../res/img/defaultProfile.png')}/></View>}
+                    />
+                  </TouchableOpacity>
+                  
+                  <TouchableOpacity onPress={()=>function_openpersonalmessage(item)} style={{flex:1,justifyContent:'center',marginLeft:16,backgroundColor:'#ffffff',height:48,flex:1,borderRadius:8}}>
+                    <Text numberOfLines={1} style={{marginLeft:12,fontSize:18,color:'#3E4DC8',fontFamily:'Montserrat-Medium'}}>{item.userName}</Text>
+                  </TouchableOpacity>
+                </View>
+                :
+                <View></View>
+              }
+            </View>
+          ))
+        }
+      </ScrollView>
 
-        <Text style={{color:'#DCDCDC',fontSize:18,fontFamily:'Montserrat-Regular',marginTop:16}}>Contacts</Text>
-
-        <FlatList    //this list will show users who are on taptotalk
-          style={{ marginVertical:16}}
-          data={onTapToTalk}
-          keyExtractor={({ id }, index) => id.toString()}
-          renderItem={({ item }) => (
-            <SafeAreaView style={{flexDirection:'row',marginVertical:6,flex:1,alignItems:'center'}}>
-
-              <TouchableOpacity onPress={()=>function_openImg(item.userProfile)} style={{backgroundColor:'#ffffff',width:44,height:44,borderRadius:44}}>
-                <Image
-                  source={{ uri: item.userProfile }}
-                  style={{width:44,height:44,borderRadius:44}}
-                  PlaceholderContent={<Text style={{fontSize:8}}>Image</Text>}
-                />
-              </TouchableOpacity>
-              
-              <TouchableOpacity onPress={()=>openpersonalmessage(item)} style={{flex:1,justifyContent:'center',marginLeft:16,backgroundColor:'#ffffff',height:48,flex:1,borderRadius:8}}>
-                <Text style={{marginLeft:12,fontSize:18,color:'#3E4DC8',fontFamily:'Montserrat-Medium'}}>{item.userName}</Text>
-              </TouchableOpacity>
-
-            </SafeAreaView>    
-          )} 
-        />
-      </SafeAreaView>
-
-    </ScrollView>
+    </View>
+       
+    </View>
   );
 }
 
