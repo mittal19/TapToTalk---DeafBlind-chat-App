@@ -10,12 +10,13 @@ then inside this collection there will be auto id generated docs where each docs
 */
 import React,{useState,useEffect} from 'react';
 import {View,Text ,Image,Dimensions, TouchableOpacity,Modal} from 'react-native';
-import { GiftedChat, InputToolbar, Bubble} from 'react-native-gifted-chat';
+import { GiftedChat, InputToolbar, Bubble, Time} from 'react-native-gifted-chat';
 import firestore from '@react-native-firebase/firestore';
 
 const {width, height} = Dimensions.get('window');
 
 GLOBAL = require('../global_userProfile');
+GLOBAL = require('../global_nonduplicates');
 
 export function component_message({route,navigation})
 {
@@ -203,9 +204,8 @@ export function component_message({route,navigation})
           borderTopWidth: 2,
           padding:4,
           height:48,
-          fontSize:8,
-
         }}
+        textInputStyle={{ color: 'black' }}
       />
     );
   }
@@ -216,18 +216,49 @@ export function component_message({route,navigation})
       <Bubble
         {...props}
         wrapperStyle={{
+          left: {
+            backgroundColor:'#3E4DC8',
+            color:'#000000'
+          },
           right: {
-            backgroundColor: '#3E4DC8'
+            backgroundColor:'#ffffff',
+            borderWidth:2,
+            borderColor:'#3E4DC8',
+            color:'#000000'
+          }
+        }}
+        textStyle={{
+          right:{
+            color:'black',
+            fontSize:16,
+            fontFamily:'Montserrat-Medium'
           },
           left:{
-            backgroundColor:'#3E4DC8'
+            color:'white',
+            fontSize:16,
+            fontFamily:'Montserrat-Medium'
           }
         }}
       />
     )
   }
 
-  
+  const function_renderTime = (props) =>
+  {
+    return (
+      <Time
+        {...props}
+        timeTextStyle={{
+          right: {
+            color: "#A9A9A9"
+          },
+          left: {
+            color: "#A9A9A9"
+          }
+        }}
+      />
+    );
+  }
 
   return (
     <View style={{flex:1,backgroundColor:'#ffffff'}}>
@@ -270,7 +301,7 @@ export function component_message({route,navigation})
           }
         </TouchableOpacity>
         
-        <Text style={{color:'#ffffff',fontSize:22,fontFamily:'Montserrat-Regular'}}>Messages</Text>
+        <Text style={{color:'#ffffff',fontSize:22,fontFamily:'Montserrat-Regular'}}>{GLOBAL.nonduplicates[details['receiver'].userNumber]}</Text>
         
         <View style={{height:40,width:40}} />
 
@@ -281,6 +312,9 @@ export function component_message({route,navigation})
       onSend={message => sendtofirebase(message)}         //when clicked send button
       renderInputToolbar={props => function_customtInputToolbar(props)}
       renderBubble={props => function_renderBubble(props)}
+      showAvatarForEveryMessage={true}
+      renderAvatar={()=>null}
+      renderTime={props=>function_renderTime(props)}
       user={{
         _id:details['sender'],    //my usernumber will be here...usernumber whose number is loggen in now...
       }}
