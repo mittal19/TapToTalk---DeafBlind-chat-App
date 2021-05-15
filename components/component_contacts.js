@@ -120,27 +120,32 @@ export function component_contacts({route,navigation})
       </Modal>
 
     
-    <View style={{marginHorizontal:16}}>
+    <View style={{marginHorizontal:width/22}}>
       
-      <Text style={{color:'#DCDCDC',fontSize:18,fontFamily:'Montserrat-Regular',marginTop:16}}>Contacts</Text>
-      
-      <ScrollView style={{ marginVertical:16}}>
+      <Text style={{color:'#DCDCDC',fontSize:width/24,fontFamily:'Montserrat-Regular',marginTop:height/48}}>Contacts</Text>
+      {
+        onTapToTalk==null?
+        <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
+          <Text style={{color:'#FFFFFF',fontSize:width/20}}>No contacts on app.</Text>
+        </View>
+        :
+        <ScrollView style={{ marginVertical:height/44}}>
         {
           onTapToTalk.map((item,key)=>(
             <View key={item.userNumber} >
               {
                 item.onTapToTalk=="Yes"?
-                <View style={{flexDirection:'row',marginVertical:6,flex:1,alignItems:'center'}}>
-                  <TouchableOpacity onPress={()=>function_openImg(item.userProfile)} style={{backgroundColor:'#ffffff',width:44,height:44,borderRadius:44}}>
+                <View style={{flexDirection:'row',marginVertical:height/112,flex:1,alignItems:'center'}}>
+                  <TouchableOpacity onPress={()=>function_openImg(item.userProfile)} style={{backgroundColor:'#ffffff',width:width/10,height:width/10,borderRadius:44}}>
                     <Image
                       source={{ uri: item.userProfile}}
-                      style={{width:44,height:44,borderRadius:44}}
-                      PlaceholderContent={<View style={{backgroundColor:'#ffffff',width:44,height:44,borderRadius:44}}><Image style={{width:44,height:44,borderRadius:44}} source={require('../res/img/defaultProfile.png')}/></View>}
+                      style={{width:width/10,height:width/10,borderRadius:44}}
+                      PlaceholderContent={<View style={{backgroundColor:'#ffffff',width:width/10,height:width/10,borderRadius:44}}><Image style={{width:width/10,height:width/10,borderRadius:44}} source={require('../res/img/defaultProfile.png')}/></View>}
                     />
                   </TouchableOpacity>
                   
-                  <TouchableOpacity onPress={()=>function_openpersonalmessage(item)} style={{flex:1,justifyContent:'center',marginLeft:16,backgroundColor:'#ffffff',height:48,flex:1,borderRadius:8}}>
-                    <Text numberOfLines={1} style={{marginLeft:12,fontSize:18,color:'#3E4DC8',fontFamily:'Montserrat-Medium'}}>{item.userName}</Text>
+                  <TouchableOpacity onPress={()=>function_openpersonalmessage(item)} style={{flex:1,justifyContent:'center',marginLeft:width/36,backgroundColor:'#ffffff',height:height/14,flex:1,borderRadius:8}}>
+                    <Text numberOfLines={1} style={{marginLeft:width/36,fontSize:width/24,color:'#3E4DC8',fontFamily:'Montserrat-Medium'}}>{item.userName}</Text>
                   </TouchableOpacity>
                 </View>
                 :
@@ -150,9 +155,8 @@ export function component_contacts({route,navigation})
           ))
         }
       </ScrollView>
-
+      }
     </View>
-       
     </View>
   );
 }
