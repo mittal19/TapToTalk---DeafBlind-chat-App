@@ -33,11 +33,13 @@ export function component_home({navigation})
     
     set_modalVisible(true);   //showing modal  // i am showing modal because there was a delay between contacts buton click  and screen showing becaus of asyncstorage .. 
 
-    var onTapToTalk=[];
+    var onTapToTalk=[],formated_Contacts;
     try
     {
       onTapToTalk= await AsyncStorage.getItem('onTapToTalk');   //get from storage
       onTapToTalk = JSON.parse(onTapToTalk);   ///string to object
+      formated_Contacts = await AsyncStorage.getItem('formated_Contacts');
+      formated_Contacts = JSON.parse(formated_Contacts);
     }
     catch(err)
     {
@@ -46,10 +48,11 @@ export function component_home({navigation})
    
     debug && console.log("component_home.js - got ontaptotalk from async storage");
     debug && console.log(onTapToTalk);
+    debug && console.log(formated_Contacts);
 
     if(onTapToTalk == null)
       onTapToTalk = [];
-    navigation.navigate('Contacts',{onTapToTalk});  //navigating to contacts component and passing ontaptotalk to next screen
+    navigation.navigate('Contacts',{onTapToTalk,formated_Contacts});  //navigating to contacts component and passing ontaptotalk to next screen
     
     setTimeout(()=>   //setting this 0 time timeout because if we dont add timeout then modal first disapper then app move to next screen ..which was not looking good.
     {

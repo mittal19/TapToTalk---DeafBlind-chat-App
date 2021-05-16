@@ -29,6 +29,7 @@ export function component_contacts({route,navigation})
   const [onTapToTalk,set_onTapToTalk] = useState(route.params.onTapToTalk);   //hold contacts on taptotalk //getting data from previous screen
   const [modalVisible, set_modalVisible] = useState(false);  //use to show image in large
   const [openImg,set_openImg] = useState();   //store which img to show in large
+  const [flg,set_flg] = useState(false);
 
   useEffect(async()=>
   {
@@ -36,16 +37,9 @@ export function component_contacts({route,navigation})
 
     try
     {
-      var temp_typeof = typeof GLOBAL.formated_Contacts;   //getting globally stored formated contacts..to know about structure of formatedcontacts go in app.js... formated contacts userprofile is null and ontaptotalk property in null for every contact
-      var formated_Contacts;
-      
-      if(temp_typeof=="string")    
-        formated_Contacts = JSON.parse(GLOBAL.formated_Contacts);   //if typeof formated contacts is string change it to object
-      else
-        formated_Contacts= GLOBAL.formated_Contacts;
+      var tempflg=true;
+      var formated_Contacts = route.params.formated_Contacts;
 
-      debug && console.log("component_home.js - got formated_Contacts from global");
-      
       var usersOnApp = await dbref.child('users').once('value').then(snap=>{return snap.val()});  //getting users from realtimedatabase
 
       debug && console.log("component_home.js - got user on tap to talk");
@@ -55,6 +49,7 @@ export function component_contacts({route,navigation})
         var phoneNumber = formated_Contacts[i].userNumber;
         if(usersOnApp[phoneNumber]!=undefined)    //if it exists then change properties of formated_contacts
         {
+          tempflg=false;
           formated_Contacts[i].onTapToTalk = "Yes";
           formated_Contacts[i].userProfile = usersOnApp[phoneNumber].userProfile;
         }
@@ -67,6 +62,8 @@ export function component_contacts({route,navigation})
  
       await AsyncStorage.setItem('onTapToTalk',JSON.stringify(formated_Contacts));   //stored updated formated_contacts in  local so that when next time user open contacts screen we have something to display instaed of just diplaying loader
 
+      if(tempflg==true)
+        set_flg(tempflg);
       debug && console.log("component_home.js - stored updated formated_contacts in  local so that when next time user open contacts screen we have something to display instaed of just diplaying loader");
     }
     catch(err)
@@ -120,11 +117,11 @@ export function component_contacts({route,navigation})
       </Modal>
 
     
-    <View style={{marginHorizontal:width/22}}>
+    <View style={{marginHorizontal:width/22,flex:1}}>
       
       <Text style={{color:'#DCDCDC',fontSize:width/24,fontFamily:'Montserrat-Regular',marginTop:height/48}}>Contacts</Text>
       {
-        onTapToTalk==null?
+        flg==true?
         <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
           <Text style={{color:'#FFFFFF',fontSize:width/20}}>No contacts on app.</Text>
         </View>
